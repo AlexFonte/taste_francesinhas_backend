@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: taste_franceseinhas_backend
+
+server:
+  port: 8082
