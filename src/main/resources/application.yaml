@@ -1,6 +1,45 @@
 spring:
   application:
-    name: taste_franceseinhas_backend
+    name: taste_francesinhas_backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?stringtype=unspecified
+    username: postgres
+    password:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      # validate: verifica que las entidades coincidan con las tablas (no las modifica)
+      # Usa 'create-drop' solo en dev si quieres que Hibernate cree las tablas
+      ddl-auto: validate
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: taste_francesinhas
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  threads:
+    virtual:
+      enabled: true
 
 server:
   port: 8082
+  servlet:
+    context-path: /tastefrancesinhas
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+app:
+  jwt:
+    secret: dev-secret-taste-francesinhas-2026
+    expiration: 3600000 #1 hora
+    refresh-expiration: 604800000 #7 dias
+

@@ -1,0 +1,47 @@
+version: "3.9"                              # versión de la sintaxis de Docker Compose
+
+services:
+  postgres:
+    image: postgres:18-alpine               # última versión estable, Alpine = imagen ligera ~70MB
+    container_name: tastefrancesinha_db             # nombre del contenedor en Docker Desktop
+    restart: unless-stopped                 # se reinicia solo excepto si lo paras tú manualmente
+    environment:
+      POSTGRES_USER: postgres                   # usuario de la base de datos
+      POSTGRES_PASSWORD:                # contraseña
+      POSTGRES_DB: postgres         # nombre de la base de datos
+      POSTGRES_HOST_AUTH_METHOD: trust # permite conectarse sin contraseña desde localhost
+
+    ports:                                  
+      - "5432:5432"                         # puerto_tu_ordenador:puerto_contenedor
+    volumes:
+      - pg_data:/var/lib/postgresql/data    # datos persistentes, no se pierden al borrar el contenedor
+      #- ./init:/docker-entrypoint-initdb.d # scripts SQL que se ejecutan al arrancar por primera vez
+    networks:
+      - pg_network                          # red interna entre contenedores
+    healthcheck:                            # comprueba que postgres está listo antes de arrancar pgadmin
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s                         # comprueba cada 10 segundos
+      timeout: 5s                           # espera máximo 5 segundos por comprobación
+      retries: 5                            # si falla 5 veces marca el contenedor como unhealthy
+
+  pgadmin:
+    image: dpage/pgadmin4:latest            # interfaz web para gestionar postgres visualmente
+    container_name: tastefrancesinha_admin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com  # login de pgadmin
+      PGADMIN_DEFAULT_PASSWORD: admin123      # contraseña de pgadmin
+    ports:
+      - "8080:80"                             # accedes desde http://localhost:8080
+    depends_on:       
+      postgres:       
+        condition: service_healthy            # espera a que postgres esté listo antes de arrancar
+    networks:         
+      - pg_network                            # misma red que postgres para que se comuniquen
+          
+volumes:          
+  pg_data:                                    # volumen gestionado por Docker donde se guardan los datos
+          
+networks:         
+  pg_network:         
+    driver: bridge                            # red privada interna entre contenedores
