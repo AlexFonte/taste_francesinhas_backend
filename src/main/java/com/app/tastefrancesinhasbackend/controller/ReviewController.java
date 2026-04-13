@@ -20,14 +20,13 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    // GET /francesinhas/{francesinhaId}/reviews — público
+    // Lista todas las reviews de una francesinha aprobada.
     @GetMapping
     public ResponseEntity<List<ReviewResponse>> findAll(@PathVariable Long francesinhaId) {
         return ResponseEntity.ok(reviewService.findByFrancesinha(francesinhaId));
     }
 
-    // POST /francesinhas/{francesinhaId}/reviews — autenticado
-    // Un usuario solo puede dejar una review por francesinha
+    // Publica una review. Cada usuario solo puede valorar una vez cada francesinha.
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReviewResponse> create(@PathVariable Long francesinhaId,
                                                  @Valid @RequestBody ReviewRequest request,
@@ -35,7 +34,7 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.create(francesinhaId, request, auth));
     }
 
-    // TODO: borrado de reviews desactivado temporalmente
+    // TODO: borrado de reviews pendiente — hay que decidir si puede borrar solo el autor o también el admin
 //    @DeleteMapping("/{reviewId}")
 //    public ResponseEntity<Void> delete(@PathVariable Long francesinhaId,
 //                                       @PathVariable Long reviewId,

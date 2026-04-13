@@ -5,9 +5,17 @@ meta {
 }
 
 get {
-  url: {{uri}}/restaurants/1
+  url: {{uri}}/restaurants/1?page=0&size=10&sort=createdAt,desc
   body: none
   auth: inherit
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: createdAt,desc
+  ~name: 
+  ~city: 
 }
 
 settings {

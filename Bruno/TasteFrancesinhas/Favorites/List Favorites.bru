@@ -5,22 +5,21 @@ meta {
 }
 
 get {
-  url: {{uri}}/favorites
+  url: {{uri}}/favorites?page=0&size=10&sort=createdAt,desc
   body: none
   auth: inherit
 }
 
-headers {
-  Authorization: Bearer {{authToken}}
-}
-
 params:query {
-  ~name:
-  ~city:
-  ~type:
   page: 0
   size: 10
   sort: createdAt,desc
+  ~name: 
+  ~city: 
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
 }
 
 settings {

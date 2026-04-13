@@ -10,6 +10,14 @@ get {
   auth: inherit
 }
 
+params:query {
+  ~name:
+  ~city:
+  page: 0
+  size: 10
+  sort: name,asc
+}
+
 settings {
   encodeUrl: true
   timeout: 0

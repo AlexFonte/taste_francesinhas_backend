@@ -5,16 +5,16 @@ meta {
 }
 
 get {
-  url: {{uri}}/francesinhas?page=6&size=10&sort=avgScore,desc
+  url: {{uri}}/francesinhas?page=0&size=10&sort=createdAt,desc
   body: none
   auth: inherit
 }
 
 params:query {
-  page: 6
+  page: 0
   size: 10
-  sort: avgScore,desc
-  ~name: Ovo
+  sort: createdAt,desc
+  ~name: 
   ~city: 
   ~type: 
 }
