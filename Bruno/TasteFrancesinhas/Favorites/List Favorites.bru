@@ -1,0 +1,29 @@
+meta {
+  name: List Favorites
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{uri}}/favorites
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  ~name:
+  ~city:
+  ~type:
+  page: 0
+  size: 10
+  sort: createdAt,desc
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

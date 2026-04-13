@@ -63,7 +63,7 @@ public class Francesinha {
 
     @Column(name = "total_reviews", nullable = false)
     @Builder.Default
-    private Long totalReviews = 0l;
+    private Long totalReviews = 0L;
 
     @Column(name = "avg_score", nullable = false, precision = 4, scale = 2)
     @Builder.Default

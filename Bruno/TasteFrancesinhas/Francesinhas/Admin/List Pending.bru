@@ -1,0 +1,26 @@
+meta {
+  name: List Pending
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{uri}}/francesinhas/pending
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: createdAt,asc
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

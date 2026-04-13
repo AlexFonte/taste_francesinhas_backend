@@ -34,7 +34,7 @@ public class AuthController {
     }
 
     // Refresh: el cliente manda el refresh token (7 días) y recibe un nuevo par de tokens
-    // Útil cuando el access token (15 min) ha expirado sin tener que volver a hacer login
+    // Útil cuando el access token (1 hora) ha expirado sin tener que volver a hacer login
     @PostMapping(value = "/refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request));
@@ -42,7 +42,7 @@ public class AuthController {
 
     // Logout: JWT es stateless, el servidor no puede invalidar tokens.
     // Se le dice al cliente que descarte el token. La responsabilidad es del frontend.
-    // Si se necesita invalidación real en el futuro → implementar blacklist con Redis.
+    // Si se necesita invalidación real en el futuro --> implementar blacklist con Redis.
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout() {
         return ResponseEntity.ok(Map.of("message", "Sesión cerrada correctamente"));

@@ -1,0 +1,25 @@
+meta {
+  name: List Francesinhas
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{uri}}/francesinhas?page=6&size=10&sort=avgScore,desc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 6
+  size: 10
+  sort: avgScore,desc
+  ~name: Ovo
+  ~city: 
+  ~type: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

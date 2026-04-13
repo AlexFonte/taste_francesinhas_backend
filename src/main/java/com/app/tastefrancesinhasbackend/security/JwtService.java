@@ -31,7 +31,7 @@ public class JwtService {
         this.refreshExpiration = refreshExpiration;
     }
 
-    // Genera un access token (15 min)
+    // Genera un access token (1 hora)
     public String generateAccessToken(UserDetails userDetails) {
         return buildToken(userDetails, expiration, Map.of());
     }

@@ -1,0 +1,31 @@
+meta {
+  name: Create Review
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{uri}}/francesinhas/1/reviews
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "scoreFlavor": 5,
+    "scoreSauce": 4,
+    "scoreBread": 4,
+    "scorePresentation": 5,
+    "comment": "Excelente francesinha, la salsa es increíble"
+  }
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

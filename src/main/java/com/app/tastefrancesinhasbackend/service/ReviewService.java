@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -93,7 +94,7 @@ public class ReviewService {
 //
 //        Francesinha francesinha = review.getFrancesinha();
 //        reviewRepository.delete(review);
-//        recalcularScore(francesinha);
+//        // TODO: recalcularScore necesita lógica de resta — firma actual: recalcularScore(Francesinha, BigDecimal)
 //    }
 
     // Actualiza avgScore y totalReviews en la francesinha de forma incremental.

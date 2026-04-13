@@ -7,12 +7,14 @@ import com.app.tastefrancesinhasbackend.entity.Restaurant;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
+import com.app.tastefrancesinhasbackend.spec.RestaurantSpec;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +22,16 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
 
-    // GET /restaurants — público
+    // Lista todos los restaurantes. Se puede filtrar por nombre o ciudad.
     @Transactional(readOnly = true)
-    public List<RestaurantResponse> findAll() {
-        return restaurantRepository.findAll()
-                .stream()
-                .map(RestaurantDTO::response)
-                .toList();
+    public Page<RestaurantResponse> findAll(String name, String city, Pageable pageable) {
+
+        Specification<Restaurant> spec = RestaurantSpec.withFilters(name, city);
+        return restaurantRepository.findAll(spec, pageable)
+                .map(RestaurantDTO::response);
     }
 
-    // GET /restaurants/{id} — público
+    // Devuelve un restaurante por id. Si no existe, lanza 404.
     @Transactional(readOnly = true)
     public RestaurantResponse findById(Long id) {
         return restaurantRepository.findById(id)
@@ -37,8 +39,7 @@ public class RestaurantService {
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurante no encontrado: " + id));
     }
 
-    // POST /restaurants — autenticado
-    // proposedBy solo registra quién hizo la propuesta, no implica propiedad
+    // Registra un restaurante nuevo. Guarda quién lo propuso, pero eso no implica permisos especiales.
     @Transactional
     public RestaurantResponse create(RestaurantRequest request, Authentication auth) {
         User proposedBy = (User) auth.getPrincipal();

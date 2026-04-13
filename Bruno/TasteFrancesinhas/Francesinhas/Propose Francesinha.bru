@@ -1,0 +1,34 @@
+meta {
+  name: Propose Francesinha
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{uri}}/francesinhas/propose
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "restaurantId": 1,
+    "name": "Francesinha especial",
+    "description": "Con salsa secreta",
+    "price": 12.50,
+    "hasEgg": true,
+    "hasFries": true,
+    "isSpicy": false,
+    "type": "ESPECIAL"
+  }
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

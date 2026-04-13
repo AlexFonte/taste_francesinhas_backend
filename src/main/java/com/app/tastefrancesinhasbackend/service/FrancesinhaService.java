@@ -8,16 +8,19 @@ import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.Restaurant;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
+import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.exception.BadRequestException;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
+import com.app.tastefrancesinhasbackend.spec.FrancesinhaSpec;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,17 +29,16 @@ public class FrancesinhaService {
     private final FrancesinhaRepository francesinhaRepository;
     private final RestaurantRepository restaurantRepository;
 
-    // GET /francesinhas — público, solo las aceptadas
+    // Devuelve las francesinhas aprobadas. Los filtros son opcionales: sin ninguno devuelve todas.
     @Transactional(readOnly = true)
-    public List<FrancesinhaResponse> findAllAccepted() {
-        return francesinhaRepository.findByStatus(FrancesinhaStatus.ACCEPTED)
-                .stream()
-                .map(FrancesinhaDTO::response)
-                .toList();
+    public Page<FrancesinhaResponse> findAllAccepted(String name, String city, FrancesinhaType type,
+                                                     Pageable pageable) {
+        return francesinhaRepository.findAll(
+                        FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city), pageable)
+                .map(FrancesinhaDTO::response);
     }
 
-    // GET /francesinhas/{id} — público, solo si está aceptada
-    // El filtro por estado se aplica en la query SQL, no en memoria
+    // Busca una francesinha aprobada por id. Si no existe o no está aprobada, lanza 404.
     @Transactional(readOnly = true)
     public FrancesinhaResponse findById(Long id) {
         return francesinhaRepository.findByIdAndStatus(id, FrancesinhaStatus.ACCEPTED)
@@ -44,16 +46,15 @@ public class FrancesinhaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
     }
 
-    // GET /francesinhas/pending — solo ADMIN, lista las pendientes de revisión
+    // Lista las francesinhas que el admin todavía no ha revisado.
     @Transactional(readOnly = true)
-    public List<FrancesinhaResponse> findAllPending() {
-        return francesinhaRepository.findByStatus(FrancesinhaStatus.PENDING)
-                .stream()
-                .map(FrancesinhaDTO::response)
-                .toList();
+    public Page<FrancesinhaResponse> findAllPending(Pageable pageable) {
+        return francesinhaRepository.findAll(
+                        FrancesinhaSpec.withFilters(FrancesinhaStatus.PENDING, null, null, null), pageable)
+                .map(FrancesinhaDTO::response);
     }
 
-    // GET /francesinhas/{id}/detail — solo ADMIN, detalle sin filtro de estado
+    // Igual que findById pero sin filtrar por estado, para que el admin pueda ver cualquier francesinha.
     @Transactional(readOnly = true)
     public FrancesinhaResponse findByIdForAdmin(Long id) {
         return francesinhaRepository.findById(id)
@@ -61,8 +62,7 @@ public class FrancesinhaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
     }
 
-    // PATCH /francesinhas/{id}/status — solo ADMIN, cambia el estado
-    // Solo se permiten las transiciones PENDING → ACCEPTED y PENDING → REJECTED
+    // El admin aprueba o rechaza una francesinha pendiente. No se puede volver a poner en PENDING.
     @Transactional
     public FrancesinhaResponse updateStatus(Long id, FrancesinhaStatusRequest request) {
         if (request.status() == FrancesinhaStatus.PENDING) {
@@ -77,8 +77,7 @@ public class FrancesinhaService {
         return FrancesinhaDTO.response(francesinhaRepository.save(francesinha));
     }
 
-    // POST /francesinhas — autenticado, propone una nueva francesinha
-    // La francesinha se crea en estado PENDING hasta que un ADMIN la acepte o rechace
+    // Un usuario propone una nueva francesinha. Queda en PENDING hasta que un admin la revise.
     @Transactional
     public FrancesinhaResponse propose(FrancesinhaRequest request, Authentication auth) {
         User proposedBy = (User) auth.getPrincipal();

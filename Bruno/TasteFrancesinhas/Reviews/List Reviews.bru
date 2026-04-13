@@ -1,0 +1,16 @@
+meta {
+  name: List Reviews
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{uri}}/francesinhas/1/reviews
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

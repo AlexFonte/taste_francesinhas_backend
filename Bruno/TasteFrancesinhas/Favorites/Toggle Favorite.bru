@@ -1,0 +1,20 @@
+meta {
+  name: Toggle Favorite
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{uri}}/favorites/1
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

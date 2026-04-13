@@ -1,11 +1,11 @@
 meta {
-  name: Login
+  name: Refresh
   type: http
-  seq: 1
+  seq: 3
 }
 
 post {
-  url: {{uri}}/auth/login
+  url: {{uri}}/auth/refresh
   body: json
   auth: inherit
 }
@@ -16,8 +16,7 @@ headers {
 
 body:json {
   {
-    "email": "admin@francesinhas.com",
-    "password": "admin"
+    "refreshToken": "{{refreshToken}}"
   }
 }
 
@@ -25,8 +24,6 @@ script:post-response {
   const body = res.getBody();
   bru.setEnvVar("authToken", body.accessToken);
   bru.setEnvVar("refreshToken", body.refreshToken);
-  
-    
 }
 
 settings {

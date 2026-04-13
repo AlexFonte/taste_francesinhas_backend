@@ -7,15 +7,19 @@ import com.app.tastefrancesinhasbackend.entity.Favorite;
 import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
+import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FavoriteRepository;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
+import com.app.tastefrancesinhasbackend.spec.FavoriteSpec;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,23 +29,23 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final FrancesinhaRepository francesinhaRepository;
 
-    // GET /favorites — solo USER, lista los favoritos del usuario autenticado
+    // Lista los favoritos del usuario autenticado. Se puede filtrar por nombre, tipo o ciudad.
     @Transactional(readOnly = true)
-    public List<FavoriteResponse> findByUser(Authentication auth) {
+    public Page<FavoriteResponse> findByUser(String name, String city, FrancesinhaType type,
+                                             Pageable pageable, Authentication auth) {
         User user = (User) auth.getPrincipal();
-        return favoriteRepository.findByUserId(user.getId())
-                .stream()
-                .map(FavoriteDTO::response)
-                .toList();
+
+        Specification<Favorite> spec = FavoriteSpec.withFilters(user.getId(), name, type, city);
+        return favoriteRepository.findAll(spec, pageable)
+                .map(FavoriteDTO::response);
     }
 
-    // POST /favorites/{francesinhaId} — solo USER
-    // Si ya es favorito lo elimina (toggle), si no lo añade
+    // Añade o quita una francesinha de favoritos. Si ya era favorita la elimina; si no, la añade.
     @Transactional
     public ToggleResponse toggle(Long francesinhaId, Authentication auth) {
         User user = (User) auth.getPrincipal();
 
-        // Solo se pueden marcar como favorito francesinhas aceptadas
+        // No tiene sentido guardar como favorita una francesinha que aún no está aprobada.
         Francesinha francesinha = francesinhaRepository.findByIdAndStatus(francesinhaId, FrancesinhaStatus.ACCEPTED)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + francesinhaId));
 

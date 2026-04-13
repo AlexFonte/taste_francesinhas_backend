@@ -1,0 +1,30 @@
+meta {
+  name: Create Restaurant
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{uri}}/restaurants
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Mi Restaurante",
+    "address": "Rua Central 10",
+    "city": "Oporto",
+    "phone": "912345678"
+  }
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

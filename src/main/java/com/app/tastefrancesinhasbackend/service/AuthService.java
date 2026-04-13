@@ -74,7 +74,7 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         // Delega en Spring Security la verificación de email + password con BCrypt
-        // Si falla lanza BadCredentialsException → capturada por GlobalExceptionHandler → 401
+        // Si falla lanza BadCredentialsException --> capturada por GlobalExceptionHandler --> 401
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );

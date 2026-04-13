@@ -1,0 +1,20 @@
+meta {
+  name: Get Pending
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{uri}}/francesinhas/pending/1
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

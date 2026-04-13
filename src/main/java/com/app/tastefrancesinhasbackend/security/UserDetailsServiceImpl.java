@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 // Implementación de UserDetailsService separada de SecurityConfig para evitar
-// el ciclo de dependencias: SecurityConfig → JwtAuthenticationFilter → UserDetailsService → SecurityConfig
+// el ciclo de dependencias: SecurityConfig --> JwtAuthenticationFilter --> UserDetailsService --> SecurityConfig
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {

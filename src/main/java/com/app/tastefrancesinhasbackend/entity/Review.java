@@ -31,26 +31,26 @@ public class Review {
 
     @Column(name = "score_flavor", nullable = false, columnDefinition = "SMALLINT")
     @Builder.Default
-    private Short scoreFlavor = 0;
+    private Short scoreFlavor = 1;
 
     @Column(name = "score_sauce", nullable = false, columnDefinition = "SMALLINT")
     @Builder.Default
-    private Short scoreSauce = 0;
+    private Short scoreSauce = 1;
 
     @Column(name = "score_bread", nullable = false, columnDefinition = "SMALLINT")
     @Builder.Default
-    private Short scoreBread = 0;
+    private Short scoreBread = 1;
 
     @Column(name = "score_presentation", nullable = false, columnDefinition = "SMALLINT")
     @Builder.Default
-    private Short scorePresentation = 0;
+    private Short scorePresentation = 1;
 
     @Column(nullable = false, length = 500)
     private String comment;
 
     @Column(name = "avg_score", nullable = false, precision = 4, scale = 2)
     @Builder.Default
-    private BigDecimal avgScore = BigDecimal.ZERO;
+    private BigDecimal avgScore = BigDecimal.ONE;
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default
