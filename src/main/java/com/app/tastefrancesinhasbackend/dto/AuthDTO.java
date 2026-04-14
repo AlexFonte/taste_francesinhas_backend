@@ -2,13 +2,17 @@ package com.app.tastefrancesinhasbackend.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class AuthDTO{
 
     public record RegisterRequest(
             @NotBlank @Email String email,
-            @NotBlank @Size(min = 8) String password
+            @NotBlank @Pattern(
+                    regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
+                    message = "La contraseña debe tener al menos 8 caracteres, una mayúscula y un número"
+            ) String password
     ) {}
 
     public record LoginRequest(
