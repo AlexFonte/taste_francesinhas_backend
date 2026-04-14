@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -68,34 +69,11 @@ public class ReviewService {
                 .build();
 
         reviewRepository.save(review);
-        recalcularScore(francesinha, reviewAvg);
+        // La BD suma todos los avgScore de las reviews (incluida la nueva) y recalcula la media
+        francesinhaRepository.updateScore(francesinha.getId());
 
         return ReviewDTO.response(review);
     }
-
-    // TODO: borrado de reviews desactivado temporalmente — pendiente de rediseñar la lógica de autorización
-//    @Transactional
-//    public void delete(Long francesinhaId, Long reviewId, Authentication auth) {
-//        User user = (User) auth.getPrincipal();
-//
-//        Review review = reviewRepository.findByFrancesinhaIdAndUserId(francesinhaId, user.getId())
-//                .orElseThrow(() -> new ResourceNotFoundException("Review no encontrada"));
-//
-//        if (!review.getId().equals(reviewId)) {
-//            throw new ResourceNotFoundException("Review no encontrada");
-//        }
-//
-//        boolean isAdmin = user.getAuthorities().stream()
-//                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if (!isAdmin && !review.getUser().getId().equals(user.getId())) {
-//            throw new UnauthorizedException("No tienes permiso para eliminar esta review");
-//        }
-//
-//        Francesinha francesinha = review.getFrancesinha();
-//        reviewRepository.delete(review);
-//        // TODO: recalcularScore necesita lógica de resta — firma actual: recalcularScore(Francesinha, BigDecimal)
-//    }
 
     // Actualiza avgScore y totalReviews en la francesinha de forma incremental.
     // Evita recargar todas las reviews de BD: usa la media acumulada + la nueva review.
@@ -111,4 +89,5 @@ public class ReviewService {
         francesinha.setAvgScore(nuevoAvg);
         francesinhaRepository.save(francesinha);
     }
+
 }
