@@ -6,6 +6,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 // { "status": 404, "title": "Not Found", "detail": "Francesinha no encontrada: 5" }
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResourceNotFoundException.class)
     ProblemDetail handleNotFound(ResourceNotFoundException ex) {
@@ -80,9 +84,10 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
-    // Captura cualquier excepción no controlada — evita exponer stack traces al cliente
+    // Captura cualquier excepción no controlada — loguea el stack trace en servidor pero no lo expone al cliente
     @ExceptionHandler(Exception.class)
     ProblemDetail handleGeneric(Exception ex) {
+        log.error("Error no controlado", ex);
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         pd.setTitle("Internal Server Error");
         pd.setDetail("Ha ocurrido un error inesperado");
