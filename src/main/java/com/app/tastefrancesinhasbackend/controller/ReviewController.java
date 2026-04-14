@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,9 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.findByFrancesinha(francesinhaId));
     }
 
-    // Publica una review. Cada usuario solo puede valorar una vez cada francesinha.
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    // Publica una review. Solo usuarios con rol USER — los admins no pueden valorar.
+    @PostMapping(value = {"", "/"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewResponse> create(@PathVariable Long francesinhaId,
                                                  @Valid @RequestBody ReviewRequest request,
                                                  Authentication auth) {

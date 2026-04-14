@@ -46,6 +46,7 @@ public class SecurityConfig {
                         // Endpoints públicos — no requieren token
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/restaurants", "/restaurants/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/francesinhas/pending", "/francesinhas/pending/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/francesinhas", "/francesinhas/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         // Todo lo demás requiere token válido

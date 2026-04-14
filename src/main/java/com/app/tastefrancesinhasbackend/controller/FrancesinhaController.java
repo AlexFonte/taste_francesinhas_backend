@@ -28,16 +28,7 @@ public class FrancesinhaController {
 
     private final FrancesinhaService francesinhaService;
 
-    /**
-     * GET /francesinhas  público, lista solo las aceptadas
-     * Filtros opcionales  ?name=franc&city=oporto&type=CLASICA
-     * Paginación: ?page=0&size=10&sort=avgScore,desc
-     * @param name
-     * @param city
-     * @param type
-     * @param pageable
-     * @return
-     */
+    // Público. Lista las francesinhas aprobadas. Filtros opcionales: ?name=&city=&type=
     @GetMapping(value = {"", "/"})
     public ResponseEntity<Map<String, Object>> findAll(
             @RequestParam(required = false) String name,
@@ -48,12 +39,7 @@ public class FrancesinhaController {
     }
 
 
-    /**
-     * GET /francesinhas/{id} — público, detalle de una francesinha aceptada
-     *
-     * @param id
-     * @return
-     */
+    // Público. Detalle de una francesinha aceptada. 404 si no existe o está pendiente/rechazada.
     @GetMapping("/{id}")
     public ResponseEntity<FrancesinhaResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(francesinhaService.findById(id));

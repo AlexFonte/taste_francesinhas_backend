@@ -14,6 +14,7 @@ import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
 import com.app.tastefrancesinhasbackend.spec.FrancesinhaSpec;
+import com.app.tastefrancesinhasbackend.spec.RestaurantSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +34,8 @@ public class FrancesinhaService {
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllAccepted(String name, String city, FrancesinhaType type,
                                                      Pageable pageable) {
-        return francesinhaRepository.findAll(
-                        FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city), pageable)
+        Specification<Francesinha> spec = FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city);
+        return francesinhaRepository.findAll(spec, pageable)
                 .map(FrancesinhaDTO::response);
     }
 

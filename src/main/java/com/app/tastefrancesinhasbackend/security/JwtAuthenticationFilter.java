@@ -38,8 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Extraemos el token quitando "Bearer "
-        final String token = authHeader.replace("Bearer ", "");
+        // Extraemos el token quitando el prefijo "Bearer " (exactamente 7 caracteres)
+        final String token = authHeader.substring(7);
 
         try {
             final String email = jwtService.extractUsername(token);

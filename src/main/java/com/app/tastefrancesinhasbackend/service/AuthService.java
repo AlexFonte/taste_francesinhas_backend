@@ -26,6 +26,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    // Crea el usuario con rol USER, lo guarda y devuelve tokens listos para usar.
+    // Así el cliente puede empezar a operar sin tener que hacer login justo después.
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new ConflictException("El email ya está registrado");
@@ -47,6 +49,7 @@ public class AuthService {
         );
     }
 
+    // Valida el refresh token y emite un par nuevo. El viejo lo descarta el cliente.
     public AuthResponse refresh(RefreshRequest request) {
         // Extraemos el email del refresh token — si está expirado o es inválido, JJWT lanza excepción
         String email;
@@ -72,6 +75,7 @@ public class AuthService {
         );
     }
 
+    // Spring Security verifica email + bcrypt. Si pasa, cargamos el usuario y generamos los tokens.
     public AuthResponse login(LoginRequest request) {
         // Delega en Spring Security la verificación de email + password con BCrypt
         // Si falla lanza BadCredentialsException --> capturada por GlobalExceptionHandler --> 401
