@@ -25,6 +25,10 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
     @EntityGraph(attributePaths = {"restaurant", "proposedBy"})
     Optional<Francesinha> findByIdAndStatus(Long id, FrancesinhaStatus status);
 
+    // Igual que findByIdAndStatus pero sin filtrar por estado — para el detalle de admin
+    @EntityGraph(attributePaths = {"restaurant", "proposedBy"})
+    Optional<Francesinha> findById(Long id);
+
     // Recalcula avg_score sumando todos los avgScore de las reviews existentes (incluida la nueva).
     // Se ejecuta después de guardar la review, dentro del mismo @Transactional.
     @Modifying

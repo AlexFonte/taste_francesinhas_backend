@@ -1,7 +1,6 @@
 package com.app.tastefrancesinhasbackend.repository;
 
 import com.app.tastefrancesinhasbackend.entity.Review;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
