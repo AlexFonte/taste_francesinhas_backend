@@ -32,6 +32,7 @@ public class FrancesinhaSpec {
 
             // Solo se hace el JOIN a restaurant si se filtra por ciudad
             if (city != null && !city.isBlank()) {
+                query.distinct(true);
                 Join<Object, Object> restaurant = root.join("restaurant", JoinType.INNER);
                 predicates.add(cb.like(cb.lower(restaurant.get("city")), "%" + city.toLowerCase() + "%"));
             }

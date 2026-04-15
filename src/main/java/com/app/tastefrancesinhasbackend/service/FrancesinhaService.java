@@ -14,7 +14,6 @@ import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
 import com.app.tastefrancesinhasbackend.spec.FrancesinhaSpec;
-import com.app.tastefrancesinhasbackend.spec.RestaurantSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

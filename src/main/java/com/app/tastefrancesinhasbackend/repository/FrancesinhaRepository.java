@@ -39,7 +39,7 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
                 FROM taste_francesinhas.review r
                 WHERE r.francesinha_id = :id
             ),
-            total_reviews = total_reviews + 1
+            total_reviews = (SELECT COUNT(r.id) FROM taste_francesinhas.review r WHERE r.francesinha_id = :id)
             WHERE id = :id
             """, nativeQuery = true)
     void updateScore(@Param("id") Long id);

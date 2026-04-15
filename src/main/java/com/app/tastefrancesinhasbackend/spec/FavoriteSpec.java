@@ -23,6 +23,7 @@ public class FavoriteSpec {
 
             // Solo se hace el JOIN a francesinha si algún filtro lo necesita
             if (name != null || type != null || city != null) {
+                query.distinct(true);
                 Join<Object, Object> francesinha = root.join("francesinha", JoinType.INNER);
 
                 if (name != null && !name.isBlank()) {
