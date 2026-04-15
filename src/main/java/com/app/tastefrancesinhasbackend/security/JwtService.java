@@ -54,33 +54,37 @@ public class JwtService {
     // Valida que el token es un access token, pertenece al usuario y no ha expirado
     // Rechaza explícitamente los refresh tokens para evitar que se usen como access tokens
     public boolean isValid(String token, UserDetails userDetails) {
-        final String email = extractUsername(token);
-        final boolean isRefresh = "refresh".equals(extractClaim(token, c -> c.get("type", String.class)));
-        return email.equals(userDetails.getUsername()) && !isExpired(token) && !isRefresh;
+        Claims claims = extractAllClaims(token);
+        String email = claims.getSubject();
+        boolean isRefresh = "refresh".equals(claims.get("type", String.class));
+        boolean isExpired = claims.getExpiration().before(new Date());
+        return email.equals(userDetails.getUsername()) && !isExpired && !isRefresh;
     }
 
     // Valida que el token es un refresh token válido y pertenece al usuario
     public boolean isValidRefreshToken(String token, UserDetails userDetails) {
-        final String email = extractUsername(token);
-        final boolean isRefresh = "refresh".equals(extractClaim(token, c -> c.get("type", String.class)));
-        return email.equals(userDetails.getUsername()) && !isExpired(token) && isRefresh;
+        Claims claims = extractAllClaims(token);
+        String email = claims.getSubject();
+        boolean isRefresh = "refresh".equals(claims.get("type", String.class));
+        boolean isExpired = claims.getExpiration().before(new Date());
+        return email.equals(userDetails.getUsername()) && !isExpired && isRefresh;
     }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    private boolean isExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
-    }
-
-    // Método genérico para extraer cualquier claim del payload del token
-    private <T> T extractClaim(String token, Function<Claims, T> resolver) {
-        Claims claims = Jwts.parser()
+    // Parsea el token una sola vez y devuelve todos los claims — usado en isValid e isValidRefreshToken
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return resolver.apply(claims);
+    }
+
+    // Método genérico para extraer un claim puntual del payload del token
+    private <T> T extractClaim(String token, Function<Claims, T> resolver) {
+        return resolver.apply(extractAllClaims(token));
     }
 }

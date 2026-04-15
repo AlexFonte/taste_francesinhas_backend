@@ -7,13 +7,13 @@ import com.app.tastefrancesinhasbackend.dto.AuthDTO.RegisterRequest;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.Role;
 import com.app.tastefrancesinhasbackend.exception.ConflictException;
-import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.exception.UnauthorizedException;
 import com.app.tastefrancesinhasbackend.repository.UserRepository;
 import com.app.tastefrancesinhasbackend.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -75,16 +75,16 @@ public class AuthService {
         );
     }
 
-    // Spring Security verifica email + bcrypt. Si pasa, cargamos el usuario y generamos los tokens.
+    // Spring Security verifica email + bcrypt. Si pasa, extraemos el usuario del resultado.
     public AuthResponse login(LoginRequest request) {
-        // Delega en Spring Security la verificación de email + password con BCrypt
+        // Delega en Spring Security la verificación de email + password con bcrypt
         // Si falla lanza BadCredentialsException --> capturada por GlobalExceptionHandler --> 401
-        authenticationManager.authenticate(
+        Authentication authResult = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + request.email()));
+        // El User ya fue cargado de BD por UserDetailsServiceImpl durante la autenticación
+        User user = (User) authResult.getPrincipal();
 
         return new AuthResponse(
                 jwtService.generateAccessToken(user),
