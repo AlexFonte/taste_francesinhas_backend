@@ -19,15 +19,15 @@ francesinhas (el "croque-monsieur" típico portugués) en restaurantes de la zon
 
 ```
 src/main/java/com/app/tastefrancesinhasbackend/
-├── config/          # SecurityConfig (CORS, filtros, BCrypt)
-├── controller/      # Controladores REST
-├── dto/             # Records de entrada/salida con método response() de mapeo
-├── entity/          # Entidades JPA
-│   └── enums/       # Role, FrancesinhaStatus, FrancesinhaType
-├── exception/       # Excepciones custom + GlobalExceptionHandler (RFC 7807)
-├── repository/      # Interfaces Spring Data JPA
-├── security/        # JwtService, JwtAuthenticationFilter, UserDetailsServiceImpl
-└── service/         # Lógica de negocio
+|-- config/          # SecurityConfig (CORS, filtros, BCrypt)
+|-- controller/      # Controladores REST
+|-- dto/             # Records de entrada/salida con método response() de mapeo
+|-- entity/          # Entidades JPA
+|   |-- enums/       # Role, FrancesinhaStatus, FrancesinhaType
+|-- exception/       # Excepciones custom + GlobalExceptionHandler (RFC 7807)
+|-- repository/      # Interfaces Spring Data JPA
+|-- security/        # JwtService, JwtAuthenticationFilter, UserDetailsServiceImpl
+|-- service/         # Lógica de negocio
 ```
 
 ## Arrancar la base de datos (Docker)

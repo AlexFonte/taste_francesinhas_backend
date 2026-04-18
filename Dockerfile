@@ -1,4 +1,4 @@
-# ── Build stage ──────────────────────────────────────────────────────────────
+# == Build stage ==============================================================
 FROM maven:3.9-amazoncorretto-25 AS build
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN chmod +x mvnw && ./mvnw dependency:go-offline -q
 COPY src ./src
 RUN ./mvnw package -DskipTests -q
 
-# ── Runtime stage ─────────────────────────────────────────────────────────────
+# == Runtime stage =============================================================
 FROM amazoncorretto:25
 WORKDIR /app
 
