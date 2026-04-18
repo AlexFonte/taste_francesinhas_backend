@@ -9,7 +9,7 @@ RUN chmod +x mvnw && ./mvnw dependency:go-offline -q
 
 # Copia el código y compila (sin tests, se ejecutan en CI)
 COPY src ./src
-RUN ./mvnw package -DskipTests -q
+RUN ./mvnw package -DskipTests=true
 
 # ── Runtime stage ─────────────────────────────────────────────────────────────
 FROM eclipse-temurin:25-jre-alpine
