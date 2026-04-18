@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/restaurants", "/restaurants/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/francesinhas/pending", "/francesinhas/pending/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/francesinhas", "/francesinhas/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/metrics", "/actuator/metrics/**").permitAll()
                         // Todo lo demás requiere token válido
                         .anyRequest().authenticated()
                 )
