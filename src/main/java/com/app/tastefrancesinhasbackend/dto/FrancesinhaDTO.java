@@ -39,13 +39,11 @@ public class FrancesinhaDTO {
             FrancesinhaStatus status,
             Long totalReviews,
             BigDecimal avgScore,
-            Long restaurantId,
-            String restaurantName,
             String proposedByEmail,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            RestaurantDTO.RestaurantResponse restaurant
     ) {}
 
-    // Mapea la entidad Francesinha al record de respuesta
     public static FrancesinhaResponse response(Francesinha f) {
         return new FrancesinhaResponse(
                 f.getId(),
@@ -59,10 +57,9 @@ public class FrancesinhaDTO {
                 f.getStatus(),
                 f.getTotalReviews(),
                 f.getAvgScore(),
-                f.getRestaurant().getId(),
-                f.getRestaurant().getName(),
                 f.getProposedBy().getEmail(),
-                f.getCreatedAt()
+                f.getCreatedAt(),
+                RestaurantDTO.response(f.getRestaurant())
         );
     }
 }
