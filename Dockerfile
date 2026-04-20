@@ -12,11 +12,11 @@ COPY src ./src
 RUN ./mvnw package -DskipTests -q
 
 # == Runtime stage =============================================================
-FROM amazoncorretto:25
+FROM amazoncorretto:25-alpine
 WORKDIR /app
 
-# Usuario no-root
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+# Usuario no-root (busybox en Alpine usa addgroup/adduser)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
 COPY --from=build /app/target/*.jar app.jar
