@@ -1,0 +1,16 @@
+meta {
+  name: metrics
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{uri}}/actuator/metrics/jvm.memory.used
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
