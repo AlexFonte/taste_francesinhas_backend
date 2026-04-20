@@ -3,6 +3,10 @@ package com.app.tastefrancesinhasbackend.controller;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewRequest;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
 import com.app.tastefrancesinhasbackend.service.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,17 +21,26 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/francesinhas/{francesinhaId}/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Tag(name = "Reviews", description = "Valoraciones de francesinhas")
 public class ReviewController {
 
     private final ReviewService reviewService;
 
-    // Lista todas las reviews de una francesinha aprobada.
+    @Operation(summary = "Listar reviews de una francesinha", description = "Público. Solo francesinhas en estado ACCEPTED.")
+    @ApiResponse(responseCode = "200", description = "Lista de reviews")
+    @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @GetMapping
     public ResponseEntity<List<ReviewResponse>> findAll(@PathVariable Long francesinhaId) {
         return ResponseEntity.ok(reviewService.findByFrancesinha(francesinhaId));
     }
 
-    // Publica una review. Solo usuarios con rol USER — los admins no pueden valorar.
+    @Operation(summary = "Publicar una review", description = "Solo USER. Un usuario puede publicar múltiples reviews sobre la misma francesinha.")
+    @ApiResponse(responseCode = "201", description = "Review creada")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "401", description = "No autenticado")
+    @ApiResponse(responseCode = "403", description = "Los administradores no pueden hacer reviews")
+    @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping(value = {"", "/"}, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewResponse> create(@PathVariable Long francesinhaId,
@@ -35,13 +48,4 @@ public class ReviewController {
                                                  Authentication auth) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.create(francesinhaId, request, auth));
     }
-
-    // TODO: borrado de reviews pendiente — hay que decidir si puede borrar solo el autor o también el admin
-//    @DeleteMapping("/{reviewId}")
-//    public ResponseEntity<Void> delete(@PathVariable Long francesinhaId,
-//                                       @PathVariable Long reviewId,
-//                                       Authentication auth) {
-//        reviewService.delete(francesinhaId, reviewId, auth);
-//        return ResponseEntity.noContent().build();
-//    }
 }

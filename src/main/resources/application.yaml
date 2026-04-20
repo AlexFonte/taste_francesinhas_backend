@@ -27,7 +27,7 @@ spring:
       enabled: true
 
 server:
-  port: ${PORT:8082}
+  port: ${PORT:8080}
   servlet:
     context-path: /tastefrancesinhas
 
@@ -39,6 +39,10 @@ management:
   info:
     env:
       enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
 
 info:
   app:

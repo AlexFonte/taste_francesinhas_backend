@@ -7,6 +7,10 @@ import com.app.tastefrancesinhasbackend.config.ApiConstants;
 import com.app.tastefrancesinhasbackend.dto.PageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FrancesinhaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,11 +28,13 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/francesinhas", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Tag(name = "Francesinhas", description = "Listado, detalle, propuesta y moderación de francesinhas para el admin")
 public class FrancesinhaController {
 
     private final FrancesinhaService francesinhaService;
 
-    // Público. Lista las francesinhas aprobadas. Filtros opcionales: ?name=&city=&type=
+    @Operation(summary = "Listar francesinhas aceptadas", description = "Filtros opcionales: name, city, type.")
+    @ApiResponse(responseCode = "200", description = "Listado paginado")
     @GetMapping(value = {"", "/"})
     public ResponseEntity<Map<String, Object>> findAll(
             @RequestParam(required = false) String name,
@@ -38,14 +44,18 @@ public class FrancesinhaController {
         return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllAccepted(name, city, type, pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
     }
 
-
-    // Público. Detalle de una francesinha aceptada. 404 si no existe o está pendiente/rechazada.
+    @Operation(summary = "Detalle de una francesinha", description = "Público. 404 si no existe o no está aprobada.")
+    @ApiResponse(responseCode = "200", description = "Francesinha encontrada")
+    @ApiResponse(responseCode = "404", description = "No encontrada o no aprobada")
     @GetMapping("/{id}")
     public ResponseEntity<FrancesinhaResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(francesinhaService.findById(id));
     }
 
-    // GET /francesinhas/pending — solo ADMIN, lista las pendientes de revisión
+    @Operation(summary = "Listar francesinhas pendientes", description = "Solo ADMIN. Lista las pendientes de revisión, ordenadas por fecha de creación ASC.")
+    @ApiResponse(responseCode = "200", description = "Listado paginado")
+    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> findAllPending(
@@ -53,15 +63,23 @@ public class FrancesinhaController {
         return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllPending(pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
     }
 
-    // GET /francesinhas/pending/{id} — solo ADMIN, detalle sin filtro de estado
+    @Operation(summary = "Detalle de francesinha pendiente", description = "Solo ADMIN. Muestra detalle de francesinha con estado pendiente.")
+    @ApiResponse(responseCode = "200", description = "Francesinha encontrada")
+    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
+    @ApiResponse(responseCode = "404", description = "No encontrada")
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/pending/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FrancesinhaResponse> findByIdForAdmin(@PathVariable Long id) {
         return ResponseEntity.ok(francesinhaService.findByIdForAdmin(id));
     }
 
-    // POST /francesinhas/propose — solo USER, propone una nueva francesinha
-    // Queda en estado PENDING hasta que un ADMIN la revise
+    @Operation(summary = "Proponer nueva francesinha", description = "Solo USER. La francesinha queda en estado PENDING hasta que un ADMIN la revise.")
+    @ApiResponse(responseCode = "201", description = "Francesinha creada en estado PENDING")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "401", description = "No autenticado")
+    @ApiResponse(responseCode = "403", description = "Solo usuarios con rol USER pueden proponer")
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping(value = "/propose", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<FrancesinhaResponse> propose(@Valid @RequestBody FrancesinhaRequest request,
@@ -69,7 +87,12 @@ public class FrancesinhaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(francesinhaService.propose(request, auth));
     }
 
-    // PATCH /francesinhas/pending/{id}/status — solo ADMIN, aprueba o rechaza
+    @Operation(summary = "Aprobar o rechazar francesinha", description = "Solo ADMIN. Cambia el estado a ACCEPTED o REJECTED.")
+    @ApiResponse(responseCode = "200", description = "Estado actualizado")
+    @ApiResponse(responseCode = "400", description = "Estado inválido")
+    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
+    @ApiResponse(responseCode = "404", description = "Francesinha no encontrada")
+    @SecurityRequirement(name = "bearerAuth")
     @PatchMapping(value = "/pending/{id}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FrancesinhaResponse> updateStatus(@PathVariable Long id,

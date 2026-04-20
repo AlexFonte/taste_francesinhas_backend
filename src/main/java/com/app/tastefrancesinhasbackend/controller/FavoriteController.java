@@ -5,6 +5,10 @@ import com.app.tastefrancesinhasbackend.dto.FavoriteDTO.ToggleResponse;
 import com.app.tastefrancesinhasbackend.dto.PageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FavoriteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,13 +24,16 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/favorites", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Tag(name = "Favorites", description = "Gestión de francesinhas favoritas del usuario")
+@SecurityRequirement(name = "bearerAuth")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    // GET /favorites — solo usuarios con rol USER (no admins)
-    // Filtros opcionales: ?name=franc&city=oporto&type=CLASICA
-    // Paginación: ?page=0&size=10&sort=createdAt,desc
+    @Operation(summary = "Listar favoritos del usuario", description = "Solo USER. Filtros opcionales: name, city, type. Paginado.")
+    @ApiResponse(responseCode = "200", description = "Listado paginado de favoritos")
+    @ApiResponse(responseCode = "401", description = "No autenticado")
+    @ApiResponse(responseCode = "403", description = "Solo usuarios con rol USER")
     @GetMapping(value = {"", "/"})
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Map<String, Object>> findAll(
@@ -38,8 +45,11 @@ public class FavoriteController {
         return ResponseEntity.ok(PageResponse.of(favoriteService.findByUser(name, city, type, pageable, auth), ApiConstants.FAVORITES_CONTENT_KEY));
     }
 
-    // POST /favorites/{francesinhaId} — solo usuarios con rol USER (no admins)
-    // Toggle: añade si no existe, elimina si ya existe
+    @Operation(summary = "Toggle favorito", description = "Solo USER. Añade la francesinha a favoritos si no estaba; la elimina si ya estaba.")
+    @ApiResponse(responseCode = "200", description = "Estado del favorito tras la operación (added / removed)")
+    @ApiResponse(responseCode = "401", description = "No autenticado")
+    @ApiResponse(responseCode = "403", description = "Solo usuarios con rol USER")
+    @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @PostMapping("/{francesinhaId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ToggleResponse> toggle(@PathVariable Long francesinhaId, Authentication auth) {

@@ -7,7 +7,6 @@ import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.Review;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
-import com.app.tastefrancesinhasbackend.exception.ConflictException;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
@@ -48,10 +47,6 @@ public class ReviewService {
 
         Francesinha francesinha = francesinhaRepository.findByIdAndStatus(francesinhaId, FrancesinhaStatus.ACCEPTED)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + francesinhaId));
-
-        if (reviewRepository.existsByFrancesinhaIdAndUserId(francesinhaId, user.getId())) {
-            throw new ConflictException("Ya has valorado esta francesinha");
-        }
 
         BigDecimal reviewAvg = BigDecimal.valueOf(
                 (request.scoreFlavor() + request.scoreSauce() + request.scoreBread() + request.scorePresentation()) / 4.0
