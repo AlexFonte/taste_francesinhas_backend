@@ -1,6 +1,7 @@
 package com.app.tastefrancesinhasbackend.dto;
 
 import com.app.tastefrancesinhasbackend.entity.Restaurant;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class RestaurantDTO {
             String phone
     ) {}
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record RestaurantResponse(
             Long id,
             String name,
@@ -25,7 +27,19 @@ public class RestaurantDTO {
     ) {}
 
     // Mapea la entidad Restaurant al record de respuesta
-    public static RestaurantResponse response(Restaurant r) {
+    public static RestaurantResponse responsePublic(Restaurant r) {
+        return new RestaurantResponse(
+                r.getId(),
+                r.getName(),
+                r.getAddress(),
+                r.getCity(),
+                r.getPhone(),
+                null,
+                r.getCreatedAt()
+        );
+    }
+
+    public static RestaurantResponse responsePrivate(Restaurant r) {
         return new RestaurantResponse(
                 r.getId(),
                 r.getName(),

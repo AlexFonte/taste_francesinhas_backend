@@ -28,14 +28,14 @@ public class RestaurantService {
 
         Specification<Restaurant> spec = RestaurantSpec.withFilters(name, city);
         return restaurantRepository.findAll(spec, pageable)
-                .map(RestaurantDTO::response);
+                .map(RestaurantDTO::responsePublic);
     }
 
     // Devuelve un restaurante por id. Si no existe, lanza 404.
     @Transactional(readOnly = true)
     public RestaurantResponse findById(Long id) {
         return restaurantRepository.findById(id)
-                .map(RestaurantDTO::response)
+                .map(RestaurantDTO::responsePublic)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurante no encontrado: " + id));
     }
 
@@ -43,7 +43,7 @@ public class RestaurantService {
     @Transactional
     public RestaurantResponse create(RestaurantRequest request, Authentication auth) {
         User proposedBy = (User) auth.getPrincipal();
-        return RestaurantDTO.response(restaurantRepository.save(buildRestaurant(request, proposedBy)));
+        return RestaurantDTO.responsePublic(restaurantRepository.save(buildRestaurant(request, proposedBy)));
     }
 
     private Restaurant buildRestaurant(RestaurantRequest request, User proposedBy) {

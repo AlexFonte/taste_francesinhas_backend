@@ -3,6 +3,7 @@ package com.app.tastefrancesinhasbackend.dto;
 import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ public class FrancesinhaDTO {
             @NotNull FrancesinhaStatus status
     ) {}
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record FrancesinhaResponse(
             Long id,
             String name,
@@ -44,7 +46,26 @@ public class FrancesinhaDTO {
             RestaurantDTO.RestaurantResponse restaurant
     ) {}
 
-    public static FrancesinhaResponse response(Francesinha f) {
+    public static FrancesinhaResponse responsePublic(Francesinha f) {
+        return new FrancesinhaResponse(
+                f.getId(),
+                f.getName(),
+                f.getDescription(),
+                f.getPrice(),
+                f.isHasEgg(),
+                f.isHasFries(),
+                f.isSpicy(),
+                f.getType(),
+                f.getStatus(),
+                f.getTotalReviews(),
+                f.getAvgScore(),
+                null,
+                f.getCreatedAt(),
+                RestaurantDTO.responsePublic(f.getRestaurant())
+        );
+    }
+
+    public static FrancesinhaResponse responsePrivate(Francesinha f) {
         return new FrancesinhaResponse(
                 f.getId(),
                 f.getName(),
@@ -59,7 +80,7 @@ public class FrancesinhaDTO {
                 f.getAvgScore(),
                 f.getProposedBy().getEmail(),
                 f.getCreatedAt(),
-                RestaurantDTO.response(f.getRestaurant())
+                RestaurantDTO.responsePrivate(f.getRestaurant())
         );
     }
 }

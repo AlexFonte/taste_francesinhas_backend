@@ -35,7 +35,7 @@ public class ReviewService {
 
         return reviewRepository.findByFrancesinhaId(francesinhaId)
                 .stream()
-                .map(ReviewDTO::response)
+                .map(ReviewDTO::responsePublic)
                 .toList();
     }
 
@@ -67,7 +67,7 @@ public class ReviewService {
         // La BD suma todos los avgScore de las reviews (incluida la nueva) y recalcula la media
         francesinhaRepository.updateScore(francesinha.getId());
 
-        return ReviewDTO.response(review);
+        return ReviewDTO.responsePublic(review);
     }
 
     // Actualiza avgScore y totalReviews en la francesinha de forma incremental.

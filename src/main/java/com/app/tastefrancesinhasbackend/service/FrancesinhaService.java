@@ -35,14 +35,14 @@ public class FrancesinhaService {
                                                      Pageable pageable) {
         Specification<Francesinha> spec = FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city);
         return francesinhaRepository.findAll(spec, pageable)
-                .map(FrancesinhaDTO::response);
+                .map(FrancesinhaDTO::responsePublic);
     }
 
     // Busca una francesinha aprobada por id. Si no existe o no está aprobada, lanza 404.
     @Transactional(readOnly = true)
     public FrancesinhaResponse findById(Long id) {
         return francesinhaRepository.findByIdAndStatus(id, FrancesinhaStatus.ACCEPTED)
-                .map(FrancesinhaDTO::response)
+                .map(FrancesinhaDTO::responsePublic)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
     }
 
@@ -51,14 +51,14 @@ public class FrancesinhaService {
     public Page<FrancesinhaResponse> findAllPending(Pageable pageable) {
         return francesinhaRepository.findAll(
                         FrancesinhaSpec.withFilters(FrancesinhaStatus.PENDING, null, null, null), pageable)
-                .map(FrancesinhaDTO::response);
+                .map(FrancesinhaDTO::responsePrivate);
     }
 
     // Igual que findById pero sin filtrar por estado, para que el admin pueda ver cualquier francesinha.
     @Transactional(readOnly = true)
     public FrancesinhaResponse findByIdForAdmin(Long id) {
         return francesinhaRepository.findById(id)
-                .map(FrancesinhaDTO::response)
+                .map(FrancesinhaDTO::responsePrivate)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
     }
 
@@ -74,7 +74,7 @@ public class FrancesinhaService {
 
         francesinha.setStatus(request.status());
 
-        return FrancesinhaDTO.response(francesinhaRepository.save(francesinha));
+        return FrancesinhaDTO.responsePrivate(francesinhaRepository.save(francesinha));
     }
 
     // Un usuario propone una nueva francesinha. Queda en PENDING hasta que un admin la revise.
@@ -97,6 +97,6 @@ public class FrancesinhaService {
                 .type(request.type())
                 .build();
 
-        return FrancesinhaDTO.response(francesinhaRepository.save(francesinha));
+        return FrancesinhaDTO.responsePublic(francesinhaRepository.save(francesinha));
     }
 }

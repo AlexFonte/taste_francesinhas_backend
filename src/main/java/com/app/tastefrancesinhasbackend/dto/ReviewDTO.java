@@ -1,6 +1,7 @@
 package com.app.tastefrancesinhasbackend.dto;
 
 import com.app.tastefrancesinhasbackend.entity.Review;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class ReviewDTO {
             @NotBlank @Size(max = 500) String comment
     ) {}
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record ReviewResponse(
             Long id,
             Short scoreFlavor,
@@ -32,8 +34,7 @@ public class ReviewDTO {
             LocalDateTime createdAt
     ) {}
 
-    // Mapea la entidad Review al record de respuesta
-    public static ReviewResponse response(Review r) {
+    public static ReviewResponse responsePublic(Review r) {
         return new ReviewResponse(
                 r.getId(),
                 r.getScoreFlavor(),
@@ -42,7 +43,7 @@ public class ReviewDTO {
                 r.getScorePresentation(),
                 r.getAvgScore(),
                 r.getComment(),
-                r.getUser().getEmail(),
+                null,
                 r.getCreatedAt()
         );
     }
