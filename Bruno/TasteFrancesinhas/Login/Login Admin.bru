@@ -1,0 +1,35 @@
+meta {
+  name: Login Admin
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{uri}}/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "admin@francesinhas.com",
+    "password": "admin1234"
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setEnvVar("authToken", body.accessToken);
+  bru.setEnvVar("refreshToken", body.refreshToken);
+  
+    
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}
