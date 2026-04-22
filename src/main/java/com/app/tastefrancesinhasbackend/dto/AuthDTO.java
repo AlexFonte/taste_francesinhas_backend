@@ -23,7 +23,8 @@ public class AuthDTO{
             String accessToken,
             String refreshToken,
             String email,
-            String role
+            String role,
+            Long userId
     ) {}
 
     public record RefreshRequest(

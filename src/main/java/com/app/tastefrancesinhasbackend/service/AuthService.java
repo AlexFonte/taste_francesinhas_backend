@@ -45,7 +45,8 @@ public class AuthService {
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user),
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getId()
         );
     }
 
@@ -71,7 +72,8 @@ public class AuthService {
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user),
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getId()
         );
     }
 
@@ -90,7 +92,8 @@ public class AuthService {
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user),
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getId()
         );
     }
 }
