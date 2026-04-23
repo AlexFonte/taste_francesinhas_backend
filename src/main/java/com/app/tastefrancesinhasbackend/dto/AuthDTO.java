@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 public class AuthDTO{
 
     public record RegisterRequest(
+            @NotBlank String name,
             @NotBlank @Email String email,
             @NotBlank @Pattern(
                     regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
@@ -22,6 +23,7 @@ public class AuthDTO{
     public record AuthResponse(
             String accessToken,
             String refreshToken,
+            String name,
             String email,
             String role,
             Long userId

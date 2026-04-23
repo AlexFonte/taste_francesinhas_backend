@@ -34,6 +34,7 @@ public class AuthService {
         }
 
         User user = User.builder()
+                .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)
@@ -44,6 +45,7 @@ public class AuthService {
         return new AuthResponse(
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user),
+                user.getName(),
                 user.getEmail(),
                 user.getRole().name(),
                 user.getId()
@@ -71,6 +73,7 @@ public class AuthService {
         return new AuthResponse(
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user),
+                user.getName(),
                 user.getEmail(),
                 user.getRole().name(),
                 user.getId()
@@ -91,6 +94,7 @@ public class AuthService {
         return new AuthResponse(
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user),
+                user.getName(),
                 user.getEmail(),
                 user.getRole().name(),
                 user.getId()
