@@ -1,5 +1,7 @@
 package com.app.tastefrancesinhasbackend.controller;
 
+import com.app.tastefrancesinhasbackend.config.ApiConstants;
+import com.app.tastefrancesinhasbackend.dto.PageResponse;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewRequest;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
 import com.app.tastefrancesinhasbackend.service.ReviewService;
@@ -9,6 +11,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/francesinhas/{francesinhaId}/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -30,8 +35,9 @@ public class ReviewController {
     @ApiResponse(responseCode = "200", description = "Lista de reviews")
     @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @GetMapping
-    public ResponseEntity<List<ReviewResponse>> findAll(@PathVariable Long francesinhaId) {
-        return ResponseEntity.ok(reviewService.findByFrancesinha(francesinhaId));
+    public ResponseEntity<Map<String, Object>> findAll(@PathVariable Long francesinhaId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(PageResponse.of(reviewService.findByFrancesinha(francesinhaId, pageable), ApiConstants.REVIEWS_CONTENT_KEY));
     }
 
     @Operation(summary = "Publicar una review", description = "Solo USER. Un usuario puede publicar múltiples reviews sobre la misma francesinha.")

@@ -44,14 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String email = jwtService.extractUsername(token);
 
-            // Solo autenticamos si tenemos email y el contexto de seguridad está vacío
-            // (evita re-autenticar si ya hay una sesión activa en el mismo request)
+            // evita re-autenticar si ya hay sesión activa en este request
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 if (jwtService.isValid(token, userDetails)) {
-                    // Creamos el objeto de autenticación y lo ponemos en el contexto de seguridad
-                    // A partir de aquí Spring sabe quién es el usuario en este request
+                    // a partir de aquí Spring conoce al usuario en este request
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());
@@ -60,8 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception ignored) {
-            // Token inválido o expirado --> el request continúa sin autenticar
-            // Spring Security devolverá 401 si el endpoint lo requiere
+            // token inválido o expirado - Spring devolverá 401 si el endpoint lo requiere
         }
 
         filterChain.doFilter(request, response);

@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
-    // Captura cualquier excepción no controlada — loguea el stack trace en servidor pero no lo expone al cliente
+    // Captura cualquier excepción no controlada - loguea el stack trace en servidor pero no lo expone al cliente
     @ExceptionHandler(Exception.class)
     ProblemDetail handleGeneric(Exception ex) {
         log.error("Error no controlado", ex);

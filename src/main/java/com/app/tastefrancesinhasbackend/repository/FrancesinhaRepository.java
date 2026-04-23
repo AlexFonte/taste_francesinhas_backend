@@ -25,7 +25,7 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
     @EntityGraph(attributePaths = {"restaurant", "proposedBy"})
     Optional<Francesinha> findByIdAndStatus(Long id, FrancesinhaStatus status);
 
-    // Igual que findByIdAndStatus pero sin filtrar por estado — para el detalle de admin
+    // Igual que findByIdAndStatus pero sin filtrar por estado - para el detalle de admin
     @EntityGraph(attributePaths = {"restaurant", "proposedBy"})
     Optional<Francesinha> findById(Long id);
 

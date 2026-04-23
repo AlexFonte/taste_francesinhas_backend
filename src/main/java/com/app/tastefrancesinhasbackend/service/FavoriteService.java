@@ -40,6 +40,12 @@ public class FavoriteService {
                 .map(FavoriteDTO::response);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isFavorite(Long francesinhaId, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return favoriteRepository.findByUserIdAndFrancesinhaId(user.getId(), francesinhaId).isPresent();
+    }
+
     // Añade o quita una francesinha de favoritos. Si ya era favorita la elimina; si no, la añade.
     @Transactional
     public ToggleResponse toggle(Long francesinhaId, Authentication auth) {

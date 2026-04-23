@@ -30,7 +30,7 @@ public class ReviewDTO {
             Short scorePresentation,
             BigDecimal avgScore,
             String comment,
-            String userEmail,
+            String userName,
             LocalDateTime createdAt
     ) {}
 
@@ -43,7 +43,7 @@ public class ReviewDTO {
                 r.getScorePresentation(),
                 r.getAvgScore(),
                 r.getComment(),
-                null,
+                r.getUser().getName(),
                 r.getCreatedAt()
         );
     }

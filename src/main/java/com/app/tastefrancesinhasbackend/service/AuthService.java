@@ -27,7 +27,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     // Crea el usuario con rol USER, lo guarda y devuelve tokens listos para usar.
-    // Así el cliente puede empezar a operar sin tener que hacer login justo después.
+    // Así el cliente puede empezar sin tener que hacer, ya que se hara un "autologin".
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new ConflictException("El email ya está registrado");
@@ -54,7 +54,7 @@ public class AuthService {
 
     // Valida el refresh token y emite un par nuevo. El viejo lo descarta el cliente.
     public AuthResponse refresh(RefreshRequest request) {
-        // Extraemos el email del refresh token — si está expirado o es inválido, JJWT lanza excepción
+        // Extraemos el email del refresh token - si está expirado o es inválido, JJWT lanza excepción
         String email;
         try {
             email = jwtService.extractUsername(request.refreshToken());

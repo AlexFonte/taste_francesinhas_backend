@@ -16,8 +16,8 @@ headers {
 
 body:json {
   {
-    "email": "test@test.com",
-    "password": "testtest"
+    "email": "aramosda@uoc.edu",
+    "password": "Fodase!1"
   }
 }
 
@@ -26,7 +26,6 @@ script:post-response {
   bru.setEnvVar("authToken", body.accessToken);
   bru.setEnvVar("refreshToken", body.refreshToken);
   
-    
 }
 
 settings {

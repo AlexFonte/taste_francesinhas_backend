@@ -5,13 +5,17 @@ meta {
 }
 
 post {
-  url: {{uri}}/favorites/1
+  url: {{uri}}/favorites/36
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 headers {
   Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: 
 }
 
 settings {

@@ -47,7 +47,7 @@ public class SecurityConfig {
                 // Sin sesiones en servidor: cada request se autentica con su propio token
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos — no requieren token
+                        // Endpoints públicos - no requieren token
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/restaurants", "/restaurants/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/francesinhas/pending", "/francesinhas/pending/**").hasRole("ADMIN")
@@ -90,7 +90,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // BCrypt con cost factor 12 — más lento = más seguro contra fuerza bruta
+    // BCrypt con cost factor 12 - más lento = más seguro contra fuerza bruta
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);

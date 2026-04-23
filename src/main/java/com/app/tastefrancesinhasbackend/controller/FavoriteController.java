@@ -45,6 +45,13 @@ public class FavoriteController {
         return ResponseEntity.ok(PageResponse.of(favoriteService.findByUser(name, city, type, pageable, auth), ApiConstants.FAVORITES_CONTENT_KEY));
     }
 
+    @Operation(summary = "Comprobar si una francesinha esta como favorita", description = "Solo USER.")
+    @GetMapping("/{francesinhaId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Map<String, Boolean>> isFavorite(@PathVariable Long francesinhaId, Authentication auth) {
+        return ResponseEntity.ok(Map.of("isFavorite", favoriteService.isFavorite(francesinhaId, auth)));
+    }
+
     @Operation(summary = "Toggle favorito", description = "Solo USER. Añade la francesinha a favoritos si no estaba; la elimina si ya estaba.")
     @ApiResponse(responseCode = "200", description = "Estado del favorito tras la operación (added / removed)")
     @ApiResponse(responseCode = "401", description = "No autenticado")

@@ -25,7 +25,6 @@ public class JwtService {
             @Value("${app.jwt.expiration}") long expiration,
             @Value("${app.jwt.refresh-expiration}") long refreshExpiration
     ) {
-        // Convierte el secret en una clave HMAC-SHA256
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
         this.refreshExpiration = refreshExpiration;
@@ -74,7 +73,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Parsea el token una sola vez y devuelve todos los claims — usado en isValid e isValidRefreshToken
+    // Parsea el token una sola vez y devuelve todos los claims - usado en isValid e isValidRefreshToken
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(signingKey)

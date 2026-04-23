@@ -1,4 +1,4 @@
-# Taste Francesinhas — Backend
+# Taste Francesinhas - Backend
 
 API REST desarrollada para el Trabajo Final de Máster (TFM) en la UOC. Permite descubrir, proponer y valorar
 francesinhas (el "croque-monsieur" típico portugués) en restaurantes de la zona.
@@ -12,7 +12,7 @@ francesinhas (el "croque-monsieur" típico portugués) en restaurantes de la zon
 | Spring Security | 7.x     |
 | PostgreSQL      | 18.x    |
 | JJWT            | 0.12.6  |
-| Lombok          | —       |
+| Lombok          | -       |
 | Maven           | 3.9.x   |
 
 ## Arquitectura

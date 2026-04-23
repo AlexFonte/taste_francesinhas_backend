@@ -15,10 +15,19 @@ headers {
 }
 
 body:json {
-  {
-    "email": "test@test.com",
-    "password": "password123"
+  { "name": "alex",
+   
+    "email": "aramosda@uoc.edu",
+    "password": "Fodase!1"
+   
   }
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setEnvVar("authToken", body.accessToken);
+  bru.setEnvVar("refreshToken", body.refreshToken);
+  
 }
 
 settings {

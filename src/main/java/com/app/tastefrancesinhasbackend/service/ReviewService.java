@@ -11,13 +11,14 @@ import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 
 
 @Service
@@ -27,19 +28,16 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final FrancesinhaRepository francesinhaRepository;
 
-    // GET /francesinhas/{id}/reviews — público, lista reviews de una francesinha aceptada
     @Transactional(readOnly = true)
-    public List<ReviewResponse> findByFrancesinha(Long francesinhaId) {
+    public Page<ReviewResponse> findByFrancesinha(Long francesinhaId, Pageable pageable) {
         francesinhaRepository.findByIdAndStatus(francesinhaId, FrancesinhaStatus.ACCEPTED)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + francesinhaId));
 
-        return reviewRepository.findByFrancesinhaId(francesinhaId)
-                .stream()
-                .map(ReviewDTO::responsePublic)
-                .toList();
+        return reviewRepository.findByFrancesinhaId(francesinhaId, pageable)
+                .map(ReviewDTO::responsePublic);
     }
 
-    // POST /francesinhas/{id}/reviews — autenticado, crea una review
+    // POST /francesinhas/{id}/reviews - autenticado, crea una review
     // Un usuario solo puede dejar una review por francesinha
     @Transactional
     public ReviewResponse create(Long francesinhaId, ReviewRequest request, Authentication auth) {
@@ -68,21 +66,6 @@ public class ReviewService {
         francesinhaRepository.updateScore(francesinha.getId());
 
         return ReviewDTO.responsePublic(review);
-    }
-
-    // Actualiza avgScore y totalReviews en la francesinha de forma incremental.
-    // Evita recargar todas las reviews de BD: usa la media acumulada + la nueva review.
-    // fórmula: nuevoAvg = (avgActual * totalActual + nuevaMedia) / (totalActual + 1)
-    private void recalcularScore(Francesinha francesinha, BigDecimal newReviewAvg) {
-        long nuevoTotal = francesinha.getTotalReviews() + 1;
-        BigDecimal nuevoAvg = francesinha.getAvgScore()
-                .multiply(BigDecimal.valueOf(francesinha.getTotalReviews()))
-                .add(newReviewAvg)
-                .divide(BigDecimal.valueOf(nuevoTotal), 2, RoundingMode.HALF_UP);
-
-        francesinha.setTotalReviews(nuevoTotal);
-        francesinha.setAvgScore(nuevoAvg);
-        francesinhaRepository.save(francesinha);
     }
 
 }
