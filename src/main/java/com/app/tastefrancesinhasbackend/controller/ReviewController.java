@@ -47,8 +47,8 @@ public class ReviewController {
     @ApiResponse(responseCode = "403", description = "Los administradores no pueden hacer reviews")
     @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping(value = {"", "/"}, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('USER')")
+    @PostMapping(value = {"", "/"}, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReviewResponse> create(@PathVariable Long francesinhaId,
                                                  @Valid @RequestBody ReviewRequest request,
                                                  Authentication auth) {
