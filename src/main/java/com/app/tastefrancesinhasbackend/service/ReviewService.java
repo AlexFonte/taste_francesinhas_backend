@@ -38,12 +38,16 @@ public class ReviewService {
     }
 
     // POST /francesinhas/{id}/reviews - autenticado, crea una review
-    // Un usuario solo puede dejar una review por francesinha
     @Transactional
     public ReviewResponse create(Long francesinhaId, ReviewRequest request, Authentication auth) {
         User user = (User) auth.getPrincipal();
 
-        Francesinha francesinha = francesinhaRepository.findByIdAndStatus(francesinhaId, FrancesinhaStatus.ACCEPTED)
+        // Si la review viene del flujo de proponer, la francesinha esta PENDING; si no, ACCEPTED.
+        FrancesinhaStatus searchByStatus = Boolean.TRUE.equals(request.propuesta())
+                ? FrancesinhaStatus.PENDING
+                : FrancesinhaStatus.ACCEPTED;
+
+        Francesinha francesinha = francesinhaRepository.findByIdAndStatus(francesinhaId, searchByStatus)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + francesinhaId));
 
         BigDecimal reviewAvg = BigDecimal.valueOf(

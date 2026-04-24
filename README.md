@@ -62,7 +62,7 @@ La API queda disponible en: `http://localhost:8082/tastefrancesinhas`
 | Context path      | `/tastefrancesinhas`                        |
 | Base de datos     | `jdbc:postgresql://localhost:5432/postgres` |
 | Schema            | `taste_francesinhas`                        |
-| JWT access token  | 15 minutos                                  |
+| JWT access token  | 1 hora                                      |
 | JWT refresh token | 7 días                                      |
 
 > En producción sustituir `app.jwt.secret` por una clave segura y actualizar los CORS con la URL real del frontend.
@@ -107,6 +107,12 @@ La API queda disponible en: `http://localhost:8082/tastefrancesinhas`
 | GET    | `/francesinhas/{id}/reviews`            | No           | Lista reviews de una francesinha |
 | POST   | `/francesinhas/{id}/reviews`            | USER / ADMIN | Crea una review (1 por usuario)  |
 | DELETE | `/francesinhas/{id}/reviews/{reviewId}` | USER / ADMIN | Borra la propia review           |
+
+> El body de `POST /francesinhas/{id}/reviews` acepta un flag opcional `propuesta` (boolean).
+> Cuando se envía como `true` el backend busca la francesinha en estado `PENDING` (usado por el
+> flujo de *Proponer* del frontend, que encadena la creación de la francesinha y su primera review
+> antes de que el admin la apruebe). Si se omite o es `false`, se busca en estado `ACCEPTED`
+> (review normal sobre una francesinha ya publicada).
 
 ### Favoritos
 

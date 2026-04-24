@@ -18,7 +18,10 @@ public class ReviewDTO {
             @NotNull @Min(1) @Max(5) Short scoreSauce,
             @NotNull @Min(1) @Max(5) Short scoreBread,
             @NotNull @Min(1) @Max(5) Short scorePresentation,
-            @NotBlank @Size(max = 500) String comment
+            @NotBlank @Size(max = 500) String comment,
+            // Cuando viene del flujo de proponer la francesinha esta en estado PENDING.
+            // En una review normal (francesinha ya aprobada) llegara como false o null.
+            Boolean propuesta
     ) {}
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
