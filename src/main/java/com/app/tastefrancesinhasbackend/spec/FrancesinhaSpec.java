@@ -16,7 +16,8 @@ public class FrancesinhaSpec {
     private FrancesinhaSpec() {}
 
     public static Specification<Francesinha> withFilters(FrancesinhaStatus status, String name,
-                                                         FrancesinhaType type, String city) {
+                                                         FrancesinhaType type, String city,
+                                                         Long restaurantId) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -28,6 +29,10 @@ public class FrancesinhaSpec {
 
             if (type != null) {
                 predicates.add(cb.equal(root.get("type"), type));
+            }
+
+            if (restaurantId != null) {
+                predicates.add(cb.equal(root.get("restaurant").get("id"), restaurantId));
             }
 
             // Solo se hace el JOIN a restaurant si se filtra por ciudad

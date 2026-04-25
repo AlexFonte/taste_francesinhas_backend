@@ -12,13 +12,22 @@ patch {
 
 headers {
   Content-Type: application/json
-  Authorization: Bearer {{authToken}}
 }
+
+auth:bearer {
+  token: {{authToken}}
+}
+
 
 body:json {
   {
     "status": "ACCEPTED"
   }
+}
+
+docs {
+  Solo ADMIN. Cambia el estado de una francesinha PENDING a ACCEPTED o REJECTED.
+  PENDING en el body devuelve 400. La francesinha no puede salir de ACCEPTED/REJECTED a otro estado.
 }
 
 settings {

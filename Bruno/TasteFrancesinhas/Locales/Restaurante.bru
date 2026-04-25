@@ -1,21 +1,13 @@
 meta {
-  name: Restaurante
+  name: Get Restaurant
   type: http
   seq: 2
 }
 
 get {
-  url: {{uri}}/restaurants/1?page=0&size=10&sort=createdAt,desc
+  url: {{uri}}/restaurants/1
   body: none
   auth: inherit
-}
-
-params:query {
-  page: 0
-  size: 10
-  sort: createdAt,desc
-  ~name: 
-  ~city: 
 }
 
 settings {

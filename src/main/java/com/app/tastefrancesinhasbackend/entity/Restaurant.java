@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 
@@ -45,4 +46,9 @@ public class Restaurant {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // Contador de francesinhas publicadas en este restaurante.
+    // Se calcula en la propia SELECT; no es una columna fisica de la tabla.
+    @Formula("(SELECT COUNT(*) FROM taste_francesinhas.francesinha f WHERE f.restaurant_id = id AND f.status = 'ACCEPTED')")
+    private Long totalFrancesinhas;
 }

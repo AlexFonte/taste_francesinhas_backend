@@ -7,11 +7,7 @@ meta {
 get {
   url: {{uri}}/francesinhas/pending
   body: none
-  auth: inherit
-}
-
-headers {
-  Authorization: Bearer {{authToken}}
+  auth: bearer
 }
 
 params:query {
@@ -20,7 +16,16 @@ params:query {
   sort: createdAt,asc
 }
 
+auth:bearer {
+  token: {{authToken}}
+}
+
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  Solo ADMIN. Lista las francesinhas en estado PENDING ordenadas por antiguedad ASC.
+  El frontend pide size=50 desde el dashboard para mostrar todas en la lista de moderacion.
 }

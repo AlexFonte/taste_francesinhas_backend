@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{uri}}/
+  url: {{uri}}/auth/login
   body: json
   auth: inherit
 }
@@ -19,6 +19,9 @@ body:json {
     "email": "admin@francesinhas.com",
     "password": "admin1234"
   }
+  
+  
+  
 }
 
 script:post-response {

@@ -11,7 +11,15 @@ get {
 }
 
 headers {
-  Authorization: Bearer {{authToken}}
+  ~Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo ADMIN. Devuelve { pending, accepted, rejected, total } para las cards del dashboard.
 }
 
 settings {

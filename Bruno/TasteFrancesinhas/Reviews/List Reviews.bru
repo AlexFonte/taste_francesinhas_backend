@@ -5,9 +5,20 @@ meta {
 }
 
 get {
-  url: {{uri}}/francesinhas/1/reviews
+  url: {{uri}}/francesinhas/1/reviews?page=0&size=10&sort=createdAt,desc
   body: none
   auth: inherit
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: createdAt,desc
+}
+
+docs {
+  Lista paginada de reviews. Solo funciona con francesinhas en estado ACCEPTED.
+  Para reviews de PENDING usar el endpoint admin /francesinhas/pending/{id}/reviews.
 }
 
 settings {

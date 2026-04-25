@@ -23,6 +23,7 @@ public class RestaurantDTO {
             String city,
             String phone,
             String proposedByEmail,
+            Long totalFrancesinhas,
             LocalDateTime createdAt
     ) {}
 
@@ -35,6 +36,7 @@ public class RestaurantDTO {
                 r.getCity(),
                 r.getPhone(),
                 null,
+                r.getTotalFrancesinhas(),
                 r.getCreatedAt()
         );
     }
@@ -47,6 +49,7 @@ public class RestaurantDTO {
                 r.getCity(),
                 r.getPhone(),
                 r.getProposedBy().getEmail(),
+                r.getTotalFrancesinhas(),
                 r.getCreatedAt()
         );
     }

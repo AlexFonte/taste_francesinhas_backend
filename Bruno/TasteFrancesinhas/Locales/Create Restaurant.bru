@@ -12,7 +12,11 @@ post {
 
 headers {
   Content-Type: application/json
-  Authorization: Bearer {{authToken}}
+  ~ Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
 }
 
 body:json {
@@ -22,6 +26,12 @@ body:json {
     "city": "Oporto",
     "phone": "912345678"
   }
+}
+
+docs {
+  USER y ADMIN. Crea un restaurante. address y phone son opcionales (name y city obligatorios).
+  Lo usa el flujo de proponer cuando el usuario activa el toggle "Nuevo restaurante":
+  primero POST /restaurants y luego POST /francesinhas/propose con el id devuelto.
 }
 
 settings {

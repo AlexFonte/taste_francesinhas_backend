@@ -33,8 +33,8 @@ public class FrancesinhaService {
     // Devuelve las francesinhas aprobadas. Los filtros son opcionales: sin ninguno devuelve todas.
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllAccepted(String name, String city, FrancesinhaType type,
-                                                     Pageable pageable) {
-        Specification<Francesinha> spec = FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city);
+                                                     Long restaurantId, Pageable pageable) {
+        Specification<Francesinha> spec = FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city, restaurantId);
         return francesinhaRepository.findAll(spec, pageable)
                 .map(FrancesinhaDTO::responsePublic);
     }
@@ -61,7 +61,7 @@ public class FrancesinhaService {
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllPending(Pageable pageable) {
         return francesinhaRepository.findAll(
-                        FrancesinhaSpec.withFilters(FrancesinhaStatus.PENDING, null, null, null), pageable)
+                        FrancesinhaSpec.withFilters(FrancesinhaStatus.PENDING, null, null, null, null), pageable)
                 .map(FrancesinhaDTO::responsePrivate);
     }
 

@@ -12,8 +12,13 @@ post {
 
 headers {
   Content-Type: application/json
-  Authorization: Bearer {{authToken}}
+  ~ Authorization: Bearer {{authToken}}
 }
+
+auth:bearer {
+  token: {{authToken}}
+}
+
 
 body:json {
   {
@@ -26,6 +31,8 @@ body:json {
     "isSpicy": false,
     "type": "ESPECIAL"
   }
+  
+  
 }
 
 settings {

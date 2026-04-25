@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{uri}}/francesinhas?page=0&size=10&sort=createdAt,desc&city=Oporto
+  url: {{uri}}/francesinhas?page=0&size=10&sort=createdAt,desc
   body: none
   auth: inherit
 }
@@ -14,12 +14,20 @@ params:query {
   page: 0
   size: 10
   sort: createdAt,desc
-  city: Oporto
-  ~name: 
-  ~type: 
+  ~name:
+  ~city:
+  ~type:
+  ~restaurantId:
+}
+
+docs {
+  Lista francesinhas en estado ACCEPTED.
+  Filtros opcionales: name (like), city (like), type (CLASICA|ESPECIAL|VEGANA|KEBAB|MARISCO), restaurantId (exacto).
+  Para activar un filtro, quitar la tilde (~) delante.
 }
 
 settings {
   encodeUrl: true
   timeout: 0
 }
+

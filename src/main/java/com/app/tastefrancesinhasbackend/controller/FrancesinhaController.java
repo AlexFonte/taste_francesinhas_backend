@@ -36,15 +36,16 @@ public class FrancesinhaController {
     private final FrancesinhaService francesinhaService;
     private final ReviewService reviewService;
 
-    @Operation(summary = "Listar francesinhas aceptadas", description = "Filtros opcionales: name, city, type.")
+    @Operation(summary = "Listar francesinhas aceptadas", description = "Filtros opcionales: name, city, type, restaurantId.")
     @ApiResponse(responseCode = "200", description = "Listado paginado")
     @GetMapping(value = {"", "/"})
     public ResponseEntity<Map<String, Object>> findAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) FrancesinhaType type,
+            @RequestParam(required = false) Long restaurantId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllAccepted(name, city, type, pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
+        return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllAccepted(name, city, type, restaurantId, pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
     }
 
     @Operation(summary = "Detalle de una francesinha", description = "Público. 404 si no existe o no está aprobada.")

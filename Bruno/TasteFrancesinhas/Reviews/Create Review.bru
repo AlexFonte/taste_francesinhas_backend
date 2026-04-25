@@ -12,7 +12,11 @@ post {
 
 headers {
   Content-Type: application/json
-  Authorization: Bearer {{authToken}}
+  ~ Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
 }
 
 body:json {
@@ -23,10 +27,16 @@ body:json {
     "scorePresentation": 5,
     "comment": "La mejor francesinha de Viana, volvere a proparla otra vez !!!"
   }
-  
+}
+
+docs {
+  Solo USER. Cada score entre 1 y 5.
+  Flag opcional `"propuesta": true` cuando se llama desde el flujo de proponer
+  (la francesinha esta en PENDING). Si se omite o es false, busca en ACCEPTED.
 }
 
 settings {
   encodeUrl: false
   timeout: 0
 }
+

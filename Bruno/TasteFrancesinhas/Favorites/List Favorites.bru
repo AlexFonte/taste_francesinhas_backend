@@ -5,24 +5,32 @@ meta {
 }
 
 get {
-  url: {{uri}}/favorites?page=0&size=10&sort=createdAt,desc
+  url: {{uri}}/favorites?page=0&size=200&sort=createdAt,desc
   body: none
   auth: inherit
 }
 
 params:query {
   page: 0
-  size: 10
+  size: 200
   sort: createdAt,desc
-  ~name: 
-  ~city: 
 }
 
 headers {
-  Authorization: Bearer {{authToken}}
+  ~Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo USER. Lista los favoritos del usuario autenticado, paginados.
+  El frontend pide size=200 al cargar para tener todos los IDs en memoria y pintar el corazon.
 }
 
 settings {
   encodeUrl: true
   timeout: 0
 }
+

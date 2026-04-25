@@ -7,14 +7,24 @@ meta {
 post {
   url: {{uri}}/favorites/36
   body: none
-  auth: none
+  auth: inherit
 }
 
 headers {
-  Authorization: Bearer {{authToken}}
+  ~Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo USER. Toggle: si la francesinha no es favorita la añade, si ya lo es la borra.
+  La URL termina en el id de la francesinha (no del favorito).
 }
 
 settings {
   encodeUrl: false
   timeout: 0
 }
+

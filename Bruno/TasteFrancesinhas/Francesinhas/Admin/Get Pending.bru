@@ -11,7 +11,16 @@ get {
 }
 
 headers {
-  Authorization: Bearer {{authToken}}
+  ~Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo ADMIN. Devuelve el detalle de una francesinha sin filtrar por estado
+  (pensado para ver propuestas en estado PENDING).
 }
 
 settings {

@@ -11,10 +11,19 @@ get {
 }
 
 headers {
-  Authorization: Bearer {{authToken}}
+  ~Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo USER. Devuelve { "isFavorite": true | false } para una francesinha concreta.
 }
 
 settings {
   encodeUrl: false
   timeout: 0
 }
+

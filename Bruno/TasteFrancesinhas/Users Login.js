@@ -1,9 +1,9 @@
 {
   "email": "admin@francesinhas.com",
-  "password": "admin"
+  "password": "admin1234"
 }
 
 {
   "email": "test@test.com",
-  "password": "password123"
+  "password": "testtest"
 }
