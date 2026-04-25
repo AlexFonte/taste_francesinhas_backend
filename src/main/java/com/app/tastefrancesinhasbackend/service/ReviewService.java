@@ -37,6 +37,18 @@ public class ReviewService {
                 .map(ReviewDTO::responsePublic);
     }
 
+    // Igual que findByFrancesinha pero sin filtrar por estado de la francesinha,
+    // pensado para que el admin pueda ver la review que dejo el proponente al crear
+    // la propuesta (la francesinha esta en PENDING).
+    @Transactional(readOnly = true)
+    public Page<ReviewResponse> findByFrancesinhaForAdmin(Long francesinhaId, Pageable pageable) {
+        francesinhaRepository.findById(francesinhaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + francesinhaId));
+
+        return reviewRepository.findByFrancesinhaId(francesinhaId, pageable)
+                .map(ReviewDTO::responsePublic);
+    }
+
     // POST /francesinhas/{id}/reviews - autenticado, crea una review
     @Transactional
     public ReviewResponse create(Long francesinhaId, ReviewRequest request, Authentication auth) {

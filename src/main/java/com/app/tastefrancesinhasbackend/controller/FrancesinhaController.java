@@ -4,6 +4,7 @@ import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaRequest;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaResponse;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaStatusRequest;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
+import com.app.tastefrancesinhasbackend.service.ReviewService;
 import com.app.tastefrancesinhasbackend.config.ApiConstants;
 import com.app.tastefrancesinhasbackend.dto.PageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
@@ -33,6 +34,7 @@ import java.util.Map;
 public class FrancesinhaController {
 
     private final FrancesinhaService francesinhaService;
+    private final ReviewService reviewService;
 
     @Operation(summary = "Listar francesinhas aceptadas", description = "Filtros opcionales: name, city, type.")
     @ApiResponse(responseCode = "200", description = "Listado paginado")
@@ -96,6 +98,18 @@ public class FrancesinhaController {
     public ResponseEntity<FrancesinhaResponse> propose(@Valid @RequestBody FrancesinhaRequest request,
                                                        Authentication auth) {
         return ResponseEntity.status(HttpStatus.CREATED).body(francesinhaService.propose(request, auth));
+    }
+
+    @Operation(summary = "Listar reviews de una francesinha pendiente", description = "Solo ADMIN. Devuelve las reviews sin filtrar por estado de la francesinha (la review que dejó el proponente cuando creó la propuesta).")
+    @ApiResponse(responseCode = "200", description = "Listado paginado")
+    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
+    @ApiResponse(responseCode = "404", description = "Francesinha no encontrada")
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/pending/{id}/reviews")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> findReviewsForAdmin(@PathVariable Long id,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(PageResponse.of(reviewService.findByFrancesinhaForAdmin(id, pageable), ApiConstants.REVIEWS_CONTENT_KEY));
     }
 
     @Operation(summary = "Aprobar o rechazar francesinha", description = "Solo ADMIN. Cambia el estado a ACCEPTED o REJECTED.")

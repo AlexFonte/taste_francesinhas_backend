@@ -1,0 +1,26 @@
+meta {
+  name: List Pending Reviews
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{uri}}/francesinhas/pending/1/reviews
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: createdAt,desc
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

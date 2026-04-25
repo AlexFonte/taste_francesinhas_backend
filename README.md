@@ -99,6 +99,7 @@ La API queda disponible en: `http://localhost:8082/tastefrancesinhas`
 | POST   | `/francesinhas/propose`             | USER  | Propone una francesinha (queda PENDING)                |
 | GET    | `/francesinhas/pending`             | ADMIN | Lista las pendientes de revisión                       |
 | GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle sin filtro de estado                           |
+| GET    | `/francesinhas/pending/{id}/reviews`| ADMIN | Reviews de una francesinha pendiente                   |
 | PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Acepta o rechaza                                       |
 
 ### Reviews
