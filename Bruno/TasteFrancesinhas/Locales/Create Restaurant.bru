@@ -32,6 +32,10 @@ docs {
   USER y ADMIN. Crea un restaurante. address y phone son opcionales (name y city obligatorios).
   Lo usa el flujo de proponer cuando el usuario activa el toggle "Nuevo restaurante":
   primero POST /restaurants y luego POST /francesinhas/propose con el id devuelto.
+
+  El restaurante nace siempre con active = false y NO aparece en GET /restaurants.
+  Se activa automaticamente cuando un admin aprueba (PATCH /francesinhas/pending/{id}/status
+  con ACCEPTED) la primera francesinha asociada.
 }
 
 settings {
