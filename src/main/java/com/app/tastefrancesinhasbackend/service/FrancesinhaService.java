@@ -85,6 +85,15 @@ public class FrancesinhaService {
 
         francesinha.setStatus(request.status());
 
+        // Si aprobamos una francesinha cuyo restaurante todavia no esta activo
+        if (request.status() == FrancesinhaStatus.ACCEPTED) {
+            Restaurant restaurant = francesinha.getRestaurant();
+            if (Boolean.FALSE.equals(restaurant.getActive())) {
+                restaurant.setActive(true);
+                restaurantRepository.save(restaurant);
+            }
+        }
+
         return FrancesinhaDTO.responsePrivate(francesinhaRepository.save(francesinha));
     }
 

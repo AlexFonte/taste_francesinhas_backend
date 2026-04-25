@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS taste_francesinhas.restaurant (
     address     VARCHAR(255),
     city        VARCHAR(255) NOT NULL,
     phone       VARCHAR(20),
+    active      BOOLEAN NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id)
 );
@@ -90,21 +91,22 @@ CREATE TABLE IF NOT EXISTS taste_francesinhas.favorite (
 INSERT INTO taste_francesinhas.user (email, password, role, created_at) VALUES
   ('admin@francwinhas.com', '$2a$12$16mBhB8Xci3Vxu.jmP/Ej.W0xn3fRdTuGIlN4RWQurG7RWaHhZjqO', 'ADMIN', NOW());
 
-INSERT INTO taste_francesinhas.restaurant (proposed_by, name, address, city, created_at) VALUES
-  (1, 'Café Rio de Janeiro', 'Rua do Cavalhido 22, 4250-204', 'Oporto', NOW()),
-  (1, 'O Recomeço', 'Rua Central da Gandra 1299, 4585-116', 'Paredes', NOW()),
-  (1, 'Leana Kebab', 'Rua Luis Barroso 514, 4760-111', 'Vilanova de Famalicão', NOW()),
-  (1, 'Leana Kebab Póvoa', 'Avenida de Baixo 8, 4490-409', 'Póvoa de Varzim', NOW()),
-  (1, 'Leana Kebab Guimarães', 'Avenida Dom Afonso Henriques 16, 4810-225', 'Guimarães', NOW()),
-  (1, 'Time Out Sports Bar', 'Avenida Eng. Armando Magalhães 371, 4440-505', 'Valongo', NOW()),
-  (1, 'Ritual das Francesinhas', 'Rua 33, nº140, 4500-807', 'Espinho', NOW()),
-  (1, 'Ponit', 'Rua Manuel Pereira da Silva 216, 4200-894', 'Oporto', NOW()),
-  (1, 'Os Eusébios', 'Avenida Dr. Carlos Pinto Ferreira 2028, 4480-665', 'Vila do Conde', NOW()),
-  (1, 'Bufete Fase', 'Rua de Santa Catarina 1147, 4000-457', 'Oporto', NOW()),
-  (1, 'Perto do Cais', 'Rua do Rei Ramiro 786, 4400-281', 'Vila Nova de Gaia', NOW()),
-  (1, 'Taberna Belga', 'Rua Mario de Almeida 67, 4700-395', 'Braga', NOW()),
-  (1, 'Cerqueira''s Lounge & Restaurant', 'Praça da Liberdade loja A8, 4900-326', 'Viana do Castelo', NOW()),
-  (1, 'Cerqueira''s in Rio', 'Rua de Limia, 4900', 'Viana do Castelo', NOW());
+INSERT INTO taste_francesinhas.restaurant (proposed_by, name, address, city, active, created_at) VALUES
+  (1, 'Café Rio de Janeiro', 'Rua do Cavalhido 22, 4250-204', 'Oporto', TRUE, NOW()),
+  (1, 'O Recomeço', 'Rua Central da Gandra 1299, 4585-116', 'Paredes', TRUE, NOW()),
+  (1, 'Leana Kebab', 'Rua Luis Barroso 514, 4760-111', 'Vilanova de Famalicão', TRUE, NOW()),
+  (1, 'Leana Kebab Póvoa', 'Avenida de Baixo 8, 4490-409', 'Póvoa de Varzim', TRUE, NOW()),
+  (1, 'Leana Kebab Guimarães', 'Avenida Dom Afonso Henriques 16, 4810-225', 'Guimarães', TRUE, NOW()),
+  (1, 'Time Out Sports Bar', 'Avenida Eng. Armando Magalhães 371, 4440-505', 'Valongo', TRUE, NOW()),
+  (1, 'Ritual das Francesinhas', 'Rua 33, nº140, 4500-807', 'Espinho', TRUE, NOW()),
+  (1, 'Ponit', 'Rua Manuel Pereira da Silva 216, 4200-894', 'Oporto', TRUE, NOW()),
+  (1, 'Os Eusébios', 'Avenida Dr. Carlos Pinto Ferreira 2028, 4480-665', 'Vila do Conde', TRUE, NOW()),
+  (1, 'Bufete Fase', 'Rua de Santa Catarina 1147, 4000-457', 'Oporto', TRUE, NOW()),
+  (1, 'Perto do Cais', 'Rua do Rei Ramiro 786, 4400-281', 'Vila Nova de Gaia', TRUE, NOW()),
+  (1, 'Taberna Belga', 'Rua Mario de Almeida 67, 4700-395', 'Braga', TRUE, NOW()),
+  (1, 'Cerqueira''s Lounge & Restaurant', 'Praça da Liberdade loja A8, 4900-326', 'Viana do Castelo', TRUE, NOW()),
+  (1, 'Cerqueira''s in Rio', 'Rua de Limia, 4900', 'Viana do Castelo', TRUE, NOW()),
+  (1, 'Restaurante Nuevo Pendiente', 'Rua das Propostas 99', 'Braga', FALSE, NOW());
 
 
 INSERT INTO taste_francesinhas.francesinha  (restaurant_id, proposed_by, name, price, has_egg, has_fries, is_spicy, type, status, total_reviews, avg_score, created_at)
@@ -172,4 +174,7 @@ VALUES
   (13, 1, 'Francesinha light', 9.00, false, true, false, 'CLASICA', 'ACCEPTED', 0, 0.00, NOW()),
   (14, 1, 'Francesinha Cerqueira''s in Rio', 14.00, false, true, false, 'ESPECIAL', 'ACCEPTED', 0, 0.00, NOW()),
   (14, 1, 'Francesinha de frango', 13.00, false, true, false, 'CLASICA', 'ACCEPTED', 0, 0.00, NOW()),
-  (14, 1, 'Francesinha de alheira', 14.00, false, true, false, 'CLASICA', 'ACCEPTED', 0, 0.00, NOW());
+  (14, 1, 'Francesinha de alheira', 14.00, false, true, false, 'CLASICA', 'ACCEPTED', 0, 0.00, NOW()),
+  (1, 1, 'Francesinha pendiente de prueba 1', 8.50, false, false, false, 'CLASICA', 'PENDING', 0, 0.00, NOW()),
+  (7, 1, 'Francesinha pendiente de prueba 2', 12.00, true, true, true, 'ESPECIAL', 'PENDING', 0, 0.00, NOW()),
+  (15, 1, 'Francesinha pendiente de prueba 3', 10.00, false, true, false, 'VEGANA', 'PENDING', 0, 0.00, NOW());

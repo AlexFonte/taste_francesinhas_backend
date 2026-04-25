@@ -43,6 +43,14 @@ public class Restaurant {
 
     private String phone;
 
+    // Un restaurante nace inactivo y solo se activa cuando un admin aprueba
+    // alguna de sus francesinhas. Asi evitamos que aparezcan en el listado
+    // restaurantes nuevos creados desde el flujo de proponer mientras la
+    // propuesta sigue pendiente de revision.
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = false;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
