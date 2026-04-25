@@ -1,0 +1,20 @@
+meta {
+  name: Get Stats
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{uri}}/francesinhas/stats
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -3,6 +3,7 @@ package com.app.tastefrancesinhasbackend.controller;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaRequest;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaResponse;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaStatusRequest;
+import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
 import com.app.tastefrancesinhasbackend.config.ApiConstants;
 import com.app.tastefrancesinhasbackend.dto.PageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
@@ -50,6 +51,16 @@ public class FrancesinhaController {
     @GetMapping("/{id}")
     public ResponseEntity<FrancesinhaResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(francesinhaService.findById(id));
+    }
+
+    @Operation(summary = "Estadísticas de moderación", description = "Solo ADMIN. Devuelve los contadores de francesinhas pendientes, aprobadas, rechazadas y el total.")
+    @ApiResponse(responseCode = "200", description = "Contadores agregados")
+    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<StatsResponse> getStats() {
+        return ResponseEntity.ok(francesinhaService.getStats());
     }
 
     @Operation(summary = "Listar francesinhas pendientes", description = "Solo ADMIN. Lista las pendientes de revisión, ordenadas por fecha de creación ASC.")

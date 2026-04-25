@@ -4,6 +4,7 @@ import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaRequest;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaResponse;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaStatusRequest;
+import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
 import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.Restaurant;
 import com.app.tastefrancesinhasbackend.entity.User;
@@ -44,6 +45,16 @@ public class FrancesinhaService {
         return francesinhaRepository.findByIdAndStatus(id, FrancesinhaStatus.ACCEPTED)
                 .map(FrancesinhaDTO::responsePublic)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
+    }
+
+    // Contadores agregados para el dashboard de admin: pendientes, aprobadas, rechazadas y total.
+    // El total se calcula sumando para evitar una query extra al COUNT(*) de la tabla entera.
+    @Transactional(readOnly = true)
+    public StatsResponse getStats() {
+        long pending  = francesinhaRepository.countByStatus(FrancesinhaStatus.PENDING);
+        long accepted = francesinhaRepository.countByStatus(FrancesinhaStatus.ACCEPTED);
+        long rejected = francesinhaRepository.countByStatus(FrancesinhaStatus.REJECTED);
+        return new StatsResponse(pending, accepted, rejected, pending + accepted + rejected);
     }
 
     // Lista las francesinhas que el admin todavía no ha revisado.

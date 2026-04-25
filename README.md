@@ -91,14 +91,15 @@ La API queda disponible en: `http://localhost:8082/tastefrancesinhas`
 
 ### Francesinhas
 
-| Método | Ruta                                | Auth  | Descripción                             |
-|--------|-------------------------------------|-------|-----------------------------------------|
-| GET    | `/francesinhas`                     | No    | Lista francesinhas aceptadas            |
-| GET    | `/francesinhas/{id}`                | No    | Detalle (solo si aceptada)              |
-| POST   | `/francesinhas/propose`             | USER  | Propone una francesinha (queda PENDING) |
-| GET    | `/francesinhas/pending`             | ADMIN | Lista las pendientes de revisión        |
-| GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle sin filtro de estado            |
-| PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Acepta o rechaza                        |
+| Método | Ruta                                | Auth  | Descripción                                            |
+|--------|-------------------------------------|-------|--------------------------------------------------------|
+| GET    | `/francesinhas`                     | No    | Lista francesinhas aceptadas                           |
+| GET    | `/francesinhas/{id}`                | No    | Detalle (solo si aceptada)                             |
+| GET    | `/francesinhas/stats`               | ADMIN | Contadores: pendientes, aprobadas, rechazadas y total  |
+| POST   | `/francesinhas/propose`             | USER  | Propone una francesinha (queda PENDING)                |
+| GET    | `/francesinhas/pending`             | ADMIN | Lista las pendientes de revisión                       |
+| GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle sin filtro de estado                           |
+| PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Acepta o rechaza                                       |
 
 ### Reviews
 

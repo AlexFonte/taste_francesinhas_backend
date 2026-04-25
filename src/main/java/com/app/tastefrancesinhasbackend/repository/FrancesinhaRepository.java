@@ -29,6 +29,10 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
     @EntityGraph(attributePaths = {"restaurant", "proposedBy"})
     Optional<Francesinha> findById(Long id);
 
+    // Cuenta cuantas francesinhas hay en un estado concreto. Lo usa el dashboard de admin
+    // para mostrar los contadores (pendientes, aprobadas, rechazadas).
+    long countByStatus(FrancesinhaStatus status);
+
     // Recalcula avg_score sumando todos los avgScore de las reviews existentes (incluida la nueva).
     // Se ejecuta después de guardar la review, dentro del mismo @Transactional.
     @Modifying

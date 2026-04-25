@@ -28,6 +28,14 @@ public class FrancesinhaDTO {
             @NotNull FrancesinhaStatus status
     ) {}
 
+    // Contadores agregados que pinta el dashboard de admin (4 cards arriba)
+    public record StatsResponse(
+            long pending,
+            long accepted,
+            long rejected,
+            long total
+    ) {}
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record FrancesinhaResponse(
             Long id,
