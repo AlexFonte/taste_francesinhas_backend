@@ -30,7 +30,7 @@ public class FrancesinhaService {
     private final FrancesinhaRepository francesinhaRepository;
     private final RestaurantRepository restaurantRepository;
 
-    // Devuelve las francesinhas aprobadas. Los filtros son opcionales: sin ninguno devuelve todas.
+    // Devuelve las francesinhas aprobadas. Los filtros son opcionales: sin ninguno hya filtros, devuelve todas.
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllAccepted(String name, String city, FrancesinhaType type,
                                                      Long restaurantId, Pageable pageable) {

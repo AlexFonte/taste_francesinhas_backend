@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
     }
 
     // Se lanza cuando un @PathVariable no puede convertirse al tipo esperado
-    // (p.ej. GET /francesinhas/propose con {id} de tipo Long). No es un 500 real.
+    // (GET /francesinhas/propose con {id} de tipo Long). No es un 500 real.
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
-    // Captura cualquier excepción no controlada - loguea el stack trace en servidor pero no lo expone al cliente
+    // Captura cualquier excepción no controlada - guarda el stack trace en servidor pero no lo expone al cliente
     @ExceptionHandler(Exception.class)
     ProblemDetail handleGeneric(Exception ex) {
         log.error("Error no controlado", ex);
