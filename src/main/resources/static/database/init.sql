@@ -1,4 +1,20 @@
--- crear tipos enum
+
+-- Esquema y permisos
+CREATE SCHEMA IF NOT EXISTS taste_francesinhas;
+
+GRANT USAGE, CREATE ON SCHEMA taste_francesinhas TO CURRENT_USER;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA taste_francesinhas
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO CURRENT_USER;
+ALTER DEFAULT PRIVILEGES IN SCHEMA taste_francesinhas
+    GRANT USAGE, SELECT ON SEQUENCES TO CURRENT_USER;
+
+-- A partir de aqui todo se crea dentro del esquema sin tener que prefijarlo.
+SET search_path TO taste_francesinhas, public;
+
+-- ============================================================================
+-- Tipos enumerados
+-- ============================================================================
 CREATE TYPE taste_francesinhas.ROLE_ENUM AS ENUM (
     'USER',
     'ADMIN'

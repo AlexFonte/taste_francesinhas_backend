@@ -1,156 +1,325 @@
 # Taste Francesinhas - Backend
 
-API REST desarrollada para el Trabajo Final de Máster (TFM) en la UOC. Permite descubrir, proponer y valorar
-francesinhas (el "croque-monsieur" típico portugués) en restaurantes de la zona.
+API REST desarrollada para el Trabajo Final de Máster (TFM) en la UOC 2025-2026 (2025-2). 
+Permite descubrir, proponer y valorar **francesinhas** (sandwich típico de Oporto, el "croque-monsieur" típico portugués) en restaurantes de la zona.
 
-## Stack tecnológico
+> Aplicación complementaria al frontend Angular ubicado en `../taste_francesinhas_frontend`.
 
-| Tecnología      | Versión |
-|-----------------|---------|
-| Java            | 25      |
-| Spring Boot     | 4.0.5   |
-| Spring Security | 7.x     |
-| PostgreSQL      | 18.x    |
-| JJWT            | 0.12.6  |
-| Lombok          | -       |
-| Maven           | 3.9.x   |
+---
 
-## Arquitectura
+## Stack
 
-```
-src/main/java/com/app/tastefrancesinhasbackend/
-|-- config/          # SecurityConfig (CORS, filtros, BCrypt)
-|-- controller/      # Controladores REST
-|-- dto/             # Records de entrada/salida con método response() de mapeo
-|-- entity/          # Entidades JPA
-|   |-- enums/       # Role, FrancesinhaStatus, FrancesinhaType
-|-- exception/       # Excepciones custom + GlobalExceptionHandler (RFC 7807)
-|-- repository/      # Interfaces Spring Data JPA
-|-- security/        # JwtService, JwtAuthenticationFilter, UserDetailsServiceImpl
-|-- service/         # Lógica de negocio
-```
+| Tecnología      | Versión  |
+|-----------------|----------|
+| Java            | 25       |
+| Spring Boot     | 4.0.5    |
+| Spring Security | 7.x      |
+| PostgreSQL      | 18.x     |
+| JJWT            | 0.12.6   |
+| Lombok          | última   |
+| Maven Wrapper   | 3.9.x    |
 
-## Arrancar la base de datos (Docker)
+---
 
-Los ficheros de Docker están en `src/main/resources/static/database/`.
+## Requisitos previos
+
+- **JDK 25** (Temurin / Oracle / Zulu)
+- **Docker Desktop** (para la base de datos local)
+- **Git**
+- (Opcional) IntelliJ IDEA o VS Code con extensión Java
+
+> Maven **NO** hace falta instalarlo: el repo incluye `mvnw` / `mvnw.cmd`.
+
+---
+
+## Instalación rápida (5 pasos)
+
+### 1. Clonar el repo
 
 ```bash
-# Arrancar PostgreSQL + pgAdmin
-docker compose -f src/main/resources/static/database/postgres_db.yml up -d
+git clone <url-del-repo>
+cd taste_franceseinhas_backend
+```
 
+### 2. Arrancar PostgreSQL con Docker
+
+```bash
+docker compose -f src/main/resources/static/database/postgres_db.yml up -d
+```
+
+Esto levanta dos contenedores:
+
+| Contenedor              | Puerto local | Acceso                      |
+|-------------------------|--------------|-----------------------------|
+| `tastefrancesinha_db`   | `5432`       | `postgres` / sin contraseña |
+| `tastefrancesinha_admin`| `8080`       | http://localhost:8080 - `admin@admin.com` / `admin123` |
+
+> **Nota:** pgAdmin ocupa el puerto `8080`. Por eso la aplicación arranca por defecto en `8082` localmente. Si pones la app en `8080`, cambia el puerto de pgAdmin antes.
+
+### 3. Crear el schema y cargar datos de ejemplo
+
+Conéctate al contenedor y ejecuta `init.sql`:
+
+```bash
+docker exec -i tastefrancesinha_db psql -U postgres -d postgres < src/main/resources/static/database/init.sql
+```
+
+O bien desde pgAdmin: **Servers → Postgres → Query Tool**, abrir `init.sql` y ejecutar.
+
+Esto crea el schema `taste_francesinhas`, todas las tablas y siembra:
+- 14 restaurantes activos + 1 pendiente
+- Francesinhas aceptadas y 3 pendientes de revisión
+- Usuarios de prueba (`USER` y `ADMIN`)
+
+### 4. Configurar variables de entorno
+
+Crea un fichero `.env` en la raíz del módulo o expórtalas en tu shell:
+
+```bash
+DB_URL=jdbc:postgresql://localhost:5432/postgres
+DB_USERNAME=postgres
+DB_PASSWORD=
+DB_SHOW_SQL=false
+PORT=8082
+ALLOWED_ORIGINS=http://localhost:4200
+JWT_SECRET=cambia-esto-por-una-clave-aleatoria-de-al-menos-256-bits
+```
+
+> **Generar `JWT_SECRET`** rápido:
+> `openssl rand -base64 64`
+> En Windows (PowerShell): `[Convert]::ToBase64String((1..64 | %{[byte](Get-Random -Max 256)}))`
+
+En IntelliJ: **Run → Edit Configurations → Environment variables**.
+
+### 5. Arrancar la aplicación
+
+```bash
+./mvnw spring-boot:run         # Linux / macOS / Git Bash
+mvnw.cmd spring-boot:run       # Windows CMD/PowerShell
+```
+
+API disponible en: **http://localhost:8082/tastefrancesinhas**
+
+Healthcheck: `GET http://localhost:8082/tastefrancesinhas/actuator/health` → `{"status":"UP"}`
+
+Swagger UI: **http://localhost:8082/tastefrancesinhas/swagger-ui.html**
+
+---
+
+## Comandos útiles de Docker
+
+```bash
 # Parar sin borrar datos
 docker compose -f src/main/resources/static/database/postgres_db.yml stop
 
-# Resetear completamente (borra todos los datos)
+# Volver a arrancar (datos preservados)
+docker compose -f src/main/resources/static/database/postgres_db.yml start
+
+# Reset total (borra el volumen y todos los datos)
 docker compose -f src/main/resources/static/database/postgres_db.yml down -v
 docker compose -f src/main/resources/static/database/postgres_db.yml up -d
+
+# Logs en vivo
+docker logs -f tastefrancesinha_db
 ```
 
-## Arrancar la aplicación
+---
 
-```bash
-./mvnw spring-boot:run
+## Estructura del código
+
+```
+src/main/java/com/app/tastefrancesinhasbackend/
+|__ config/          # SecurityConfig, ApiConstants
+|__ controller/      # AuthController, FrancesinhaController, ReviewController, ...
+|__ dto/             # Records de entrada/salida (FrancesinhaDTO, AuthDTO, ...)
+|__ entity/          # Entidades JPA (User, Francesinha, Restaurant, Review, Favorite)
+|   |__ enums/       # Role, FrancesinhaStatus, FrancesinhaType
+|__ exception/       # GlobalExceptionHandler (formato RFC 7807)
+|__ repository/      # Interfaces Spring Data JPA
+|__ security/        # JwtService, JwtAuthenticationFilter, UserDetailsServiceImpl
+|__ service/         # Lógica de negocio
+|__ spec/            # Specifications JPA para filtros dinámicos
 ```
 
-La API queda disponible en: `http://localhost:8082/tastefrancesinhas`
+---
 
-## Configuración (`application.yaml`)
-
-| Propiedad         | Valor                                       |
-|-------------------|---------------------------------------------|
-| Puerto            | `8082`                                      |
-| Context path      | `/tastefrancesinhas`                        |
-| Base de datos     | `jdbc:postgresql://localhost:5432/postgres` |
-| Schema            | `taste_francesinhas`                        |
-| JWT access token  | 1 hora                                      |
-| JWT refresh token | 7 días                                      |
-
-> En producción sustituir `app.jwt.secret` por una clave segura y actualizar los CORS con la URL real del frontend.
-
-## Endpoints
+## Endpoints principales
 
 ### Auth
-
-| Método | Ruta            | Auth | Descripción               |
-|--------|-----------------|------|---------------------------|
-| POST   | `/auth/signup`  | No   | Registro, devuelve tokens |
-| POST   | `/auth/login`   | No   | Login, devuelve tokens    |
-| POST   | `/auth/refresh` | No   | Renueva el par de tokens  |
-| POST   | `/auth/logout`  | No   | Logout (stateless)        |
+| Método | Ruta            | Auth | Descripción            |
+|--------|-----------------|------|------------------------|
+| POST   | `/auth/signup`  | -    | Registro               |
+| POST   | `/auth/login`   | -    | Login                  |
+| POST   | `/auth/refresh` | -    | Renueva par de tokens  |
 
 ### Restaurantes
-
 | Método | Ruta                | Auth         | Descripción                  |
 |--------|---------------------|--------------|------------------------------|
-| GET    | `/restaurants`      | No           | Lista todos los restaurantes |
-| GET    | `/restaurants/{id}` | No           | Detalle de un restaurante    |
-| POST   | `/restaurants`      | USER / ADMIN | Propone un nuevo restaurante |
-
-> Los restaurantes nunca se eliminan. También se crean automáticamente cuando se propone una francesinha en un local que
-> aún no existe.
+| GET    | `/restaurants`      | -            | Listado paginado (solo activos) |
+| GET    | `/restaurants/{id}` | -            | Detalle                      |
+| POST   | `/restaurants`      | USER / ADMIN | Crea un restaurante (nace inactivo) |
 
 ### Francesinhas
-
-| Método | Ruta                                | Auth  | Descripción                                            |
-|--------|-------------------------------------|-------|--------------------------------------------------------|
-| GET    | `/francesinhas`                     | No    | Lista francesinhas aceptadas                           |
-| GET    | `/francesinhas/{id}`                | No    | Detalle (solo si aceptada)                             |
-| GET    | `/francesinhas/stats`               | ADMIN | Contadores: pendientes, aprobadas, rechazadas y total  |
-| POST   | `/francesinhas/propose`             | USER  | Propone una francesinha (queda PENDING)                |
-| GET    | `/francesinhas/pending`             | ADMIN | Lista las pendientes de revisión                       |
-| GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle sin filtro de estado                           |
-| GET    | `/francesinhas/pending/{id}/reviews`| ADMIN | Reviews de una francesinha pendiente                   |
-| PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Acepta o rechaza                                       |
+| Método | Ruta                                | Auth  | Descripción                     |
+|--------|-------------------------------------|-------|---------------------------------|
+| GET    | `/francesinhas`                     | -     | Listado aceptadas (paginado)    |
+| GET    | `/francesinhas/{id}`                | -     | Detalle                         |
+| GET    | `/francesinhas/stats`               | ADMIN | Contadores (pending/accepted/…) |
+| POST   | `/francesinhas/propose`             | USER  | Propuesta nueva (queda PENDING) |
+| GET    | `/francesinhas/pending`             | ADMIN | Listado pendientes              |
+| GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle sin filtro de estado    |
+| GET    | `/francesinhas/pending/{id}/reviews`| ADMIN | Reviews de una pendiente        |
+| PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Aprobar / rechazar              |
 
 ### Reviews
+| Método | Ruta                                    | Auth         | Descripción           |
+|--------|-----------------------------------------|--------------|-----------------------|
+| GET    | `/francesinhas/{id}/reviews`            | -            | Listado paginado      |
+| POST   | `/francesinhas/{id}/reviews`            | USER / ADMIN | Crear (1 por usuario) |
+| DELETE | `/francesinhas/{id}/reviews/{reviewId}` | USER / ADMIN | Borrar la propia      |
 
-| Método | Ruta                                    | Auth         | Descripción                      |
-|--------|-----------------------------------------|--------------|----------------------------------|
-| GET    | `/francesinhas/{id}/reviews`            | No           | Lista reviews de una francesinha |
-| POST   | `/francesinhas/{id}/reviews`            | USER / ADMIN | Crea una review (1 por usuario)  |
-| DELETE | `/francesinhas/{id}/reviews/{reviewId}` | USER / ADMIN | Borra la propia review           |
-
-> El body de `POST /francesinhas/{id}/reviews` acepta un flag opcional `propuesta` (boolean).
-> Cuando se envía como `true` el backend busca la francesinha en estado `PENDING` (usado por el
-> flujo de *Proponer* del frontend, que encadena la creación de la francesinha y su primera review
-> antes de que el admin la apruebe). Si se omite o es `false`, se busca en estado `ACCEPTED`
-> (review normal sobre una francesinha ya publicada).
+> El POST acepta un flag opcional `propuesta: true` - usado por el flujo "Proponer" para asociar la primera review a una francesinha aún estado PENDING.
 
 ### Favoritos
+| Método | Ruta                          | Auth | Descripción                   |
+|--------|-------------------------------|------|-------------------------------|
+| GET    | `/favorites`                  | USER | Listado paginado              |
+| GET    | `/favorites/{francesinhaId}`  | USER | Check `{ isFavorite: bool }`  |
+| POST   | `/favorites/{francesinhaId}`  | USER | Toggle (añade o elimina)      |
 
-| Método | Ruta                         | Auth | Descripción                       |
-|--------|------------------------------|------|-----------------------------------|
-| GET    | `/favorites`                 | USER | Lista los favoritos del usuario   |
-| POST   | `/favorites/{francesinhaId}` | USER | Toggle favorito (añade o elimina) |
-
-> Los favoritos solo son accesibles para usuarios con rol `USER`. Los `ADMIN` no tienen favoritos.
+---
 
 ## Seguridad
 
-- Autenticación stateless con **JWT Bearer token**
-- Contraseñas hasheadas con **BCrypt** (cost factor 12)
-- Roles: `USER` y `ADMIN`
-- Autorización a nivel de método con `@PreAuthorize`
-- Errores devueltos en formato **RFC 7807 ProblemDetail**
+- **BCrypt** cost factor 12 para el hash de contraseñas
+- Roles: `USER` y `ADMIN` (ADMIN no puede valorar ni marcar favoritos)
+- Autorización a nivel de URL (`SecurityConfig`) + método (`@PreAuthorize`)
+- Errores en formato **RFC 7807 ProblemDetail**
+- **401** cuando el token está caducado/ausente, **403** cuando el rol no es el permitido
 
-## Ejemplos de uso
+### JWT dual-token
+
+La autenticación es **stateless**: no se guarda sesión en servidor, cada request se valida con su propio token. Hay dos tipos:
+
+| Token             | Duración | Cómo se envía                          | Para qué sirve                                         |
+|-------------------|----------|----------------------------------------|--------------------------------------------------------|
+| **Access token**  | 1 hora   | Header `Authorization: Bearer <token>` | Autenticar cualquier petición a la API                 |
+| **Refresh token** | 7 días   | Body de `POST /auth/refresh`           | Obtener un nuevo par cuando el access token caduca     |
+
+Ambos se firman con `HS256` y la clave `JWT_SECRET`. El refresh lleva un claim extra `type=refresh` que `JwtService.isValid()` rechaza explícitamente - así un refresh **no** puede usarse como access token.
+
+#### Claims del access token
+
+```json
+{
+  "sub": "alex@example.com",          // email del usuario (subject)
+  "role": "USER",                     // ROLE_USER | ROLE_ADMIN
+  "iat": 1745692800,                  // issued at (epoch seconds)
+  "exp": 1745696400                   // expiration (iat + 1h)
+}
+```
+
+#### Claims del refresh token
+
+```json
+{
+  "sub": "alex@example.com",
+  "type": "refresh",                  // marca distintiva
+  "iat": 1745692800,
+  "exp": 1746297600                   // iat + 7 días
+}
+```
+
+#### Flujo de renovación
+
+```
+1. POST /auth/login            → { accessToken, refreshToken, name, email, role }
+2. GET /favorites              → Authorization: Bearer <accessToken>
+   ...una hora después...
+3. GET /favorites              → 401 Unauthorized (access caducado)
+4. POST /auth/refresh          → body { refreshToken: "..." }
+                                 → { accessToken, refreshToken, ... }   (par nuevo)
+5. GET /favorites              → Authorization: Bearer <nuevo accessToken>
+```
+
+> **Decisión**: el endpoint `/auth/refresh` devuelve **un par nuevo** (rotación), no solo un access nuevo. Así el refresh anterior queda invalidado por expiración natural en 7 días desde el último uso.
+
+#### Configuración (variables de entorno)
+
+| Variable                | Default        | Descripción                                  |
+|-------------------------|----------------|----------------------------------------------|
+| `JWT_SECRET`            | (obligatorio)  | Clave HMAC ≥ 256 bits en Base64              |
+| `app.jwt.expiration`    | `3600000` ms   | TTL del access token (1 h)                   |
+| `app.jwt.refresh-expiration` | `604800000` ms | TTL del refresh token (7 días)          |
+
+#### Punto de entrada para no autenticados
+
+`SecurityConfig` declara un `AuthenticationEntryPoint` que devuelve **401** con cuerpo `application/problem+json` (mismo formato que `GlobalExceptionHandler`):
+
+```json
+{
+  "type": "about:blank",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "Token caducado o ausente"
+}
+```
+
+Esto reemplaza el comportamiento por defecto de Spring Security (que devolvería 403 a peticiones anónimas) y permite al frontend distinguir limpiamente:
+- **401** → sesión expirada → hacer logout y redirigir a login
+- **403** → autenticado pero sin permisos → mostrar mensaje, no logout
+
+---
+
+## Pruebas con Bruno
+
+El repo incluye una colección **Bruno** lista para usar en `Bruno/TasteFrancesinhas/`:
+
+1. Instalar [Bruno](https://www.usebruno.com/).
+2. Abrir la carpeta `Bruno/TasteFrancesinhas/`.
+3. Seleccionar el environment `Local` o `Prod`.
+4. Ejecutar `Auth/Login` - el script guarda el token en una variable de colección.
+5. El resto de requests autenticadas leerán ese token automáticamente.
+
+---
+
+## Ejemplos cURL
 
 ```bash
 # Registro
 curl -X POST http://localhost:8082/tastefrancesinhas/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
+  -d '{"name":"Alex","email":"alex@example.com","password":"Password1"}'
 
 # Login
 curl -X POST http://localhost:8082/tastefrancesinhas/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
+  -d '{"email":"alex@example.com","password":"Password1"}'
 
-# Listado público de francesinhas
+# Listado público
 curl http://localhost:8082/tastefrancesinhas/francesinhas
 
-# Proponer una francesinha (requiere token)
-curl -X POST http://localhost:8082/tastefrancesinhas/francesinhas/propose \
-  -H "Authorization: Bearer <access_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"restaurantId":1,"name":"Francesinha Especial","price":12.50,"type":"ESPECIAL"}'
+# Endpoint autenticado
+curl http://localhost:8082/tastefrancesinhas/favorites \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
+---
+
+## Despliegue
+
+- **Backend**: Railway (variables de entorno gestionadas en el panel del proyecto).
+- **Base de datos**: Supabase (PostgreSQL gestionado).
+- `ddl-auto: validate` - Hibernate **no** modifica el schema; cualquier cambio se aplica como migración manual en Supabase.
+
+---
+
+## Troubleshooting
+
+| Síntoma                                          | Causa probable                         | Solución                                      |
+|--------------------------------------------------|----------------------------------------|-----------------------------------------------|
+| `Connection refused` al arrancar Spring          | PostgreSQL no está levantado           | `docker compose ... up -d` y esperar healthy  |
+| `Schema "taste_francesinhas" not found`          | No se ejecutó `init.sql`               | Ejecutar paso 3 del bloque de instalación     |
+| `JWT signature does not match`                   | `JWT_SECRET` cambió entre arranques    | Mantener el mismo secret o re-loguearse       |
+| `403 Forbidden` con token aparentemente válido   | Endpoint requiere otro rol             | Revisar `@PreAuthorize` del controller        |
+| pgAdmin no arranca, puerto 8080 ocupado          | La app Spring está usando 8080         | Cambiar `PORT=8082` (o el de pgAdmin)         |
