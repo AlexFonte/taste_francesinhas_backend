@@ -33,17 +33,18 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
     // para mostrar los contadores (pendientes, aprobadas, rechazadas).
     long countByStatus(FrancesinhaStatus status);
 
-    // Recalcula avg_score sumando todos los avgScore de las reviews existentes (incluida la nueva).
-    // Se ejecuta después de guardar la review, dentro del mismo @Transactional.
+    // Recalcula avg_score y las 4 medias por criterio sumando todas las reviews existentes (incluida la nueva).
+    // Se ejecuta despues de guardar la review, dentro del mismo @Transactional. 
+    // COALESCE para que cuand no hay reviews la columna NOT NULL no falle.
     @Modifying
     @Query(value = """
             UPDATE taste_francesinhas.francesinha
-            SET avg_score = (
-                SELECT SUM(r.avg_score) / COUNT(r.id)
-                FROM taste_francesinhas.review r
-                WHERE r.francesinha_id = :id
-            ),
-            total_reviews = (SELECT COUNT(r.id) FROM taste_francesinhas.review r WHERE r.francesinha_id = :id)
+            SET avg_score          = COALESCE((SELECT AVG(r.avg_score)          FROM taste_francesinhas.review r WHERE r.francesinha_id = :id), 0),
+                avg_flavor         = COALESCE((SELECT AVG(r.score_flavor)       FROM taste_francesinhas.review r WHERE r.francesinha_id = :id), 0),
+                avg_sauce          = COALESCE((SELECT AVG(r.score_sauce)        FROM taste_francesinhas.review r WHERE r.francesinha_id = :id), 0),
+                avg_bread          = COALESCE((SELECT AVG(r.score_bread)        FROM taste_francesinhas.review r WHERE r.francesinha_id = :id), 0),
+                avg_presentation   = COALESCE((SELECT AVG(r.score_presentation) FROM taste_francesinhas.review r WHERE r.francesinha_id = :id), 0),
+                total_reviews      = (SELECT COUNT(r.id) FROM taste_francesinhas.review r WHERE r.francesinha_id = :id)
             WHERE id = :id
             """, nativeQuery = true)
     void updateScore(@Param("id") Long id);

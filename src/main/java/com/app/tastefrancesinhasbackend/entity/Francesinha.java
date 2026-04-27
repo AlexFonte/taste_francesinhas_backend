@@ -77,6 +77,23 @@ public class Francesinha {
     @Builder.Default
     private BigDecimal avgScore = BigDecimal.ZERO;
 
+    // Medias por criterio: se recalculan en updateScore() junto con avg_score, no se tocan desde Java.
+    @Column(name = "avg_flavor", nullable = false, precision = 4, scale = 2)
+    @Builder.Default
+    private BigDecimal avgFlavor = BigDecimal.ZERO;
+
+    @Column(name = "avg_sauce", nullable = false, precision = 4, scale = 2)
+    @Builder.Default
+    private BigDecimal avgSauce = BigDecimal.ZERO;
+
+    @Column(name = "avg_bread", nullable = false, precision = 4, scale = 2)
+    @Builder.Default
+    private BigDecimal avgBread = BigDecimal.ZERO;
+
+    @Column(name = "avg_presentation", nullable = false, precision = 4, scale = 2)
+    @Builder.Default
+    private BigDecimal avgPresentation = BigDecimal.ZERO;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

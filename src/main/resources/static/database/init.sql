@@ -70,9 +70,13 @@ CREATE TABLE IF NOT EXISTS taste_francesinhas.francesinha (
     is_spicy      BOOLEAN NOT NULL DEFAULT false,
     type          taste_francesinhas.FRANCESINHA_TYPE_ENUM NOT NULL,
     status        taste_francesinhas.FRANCESINHA_STATUS_ENUM NOT NULL,
-    total_reviews BIGINT NOT NULL DEFAULT 0,
-    avg_score     DECIMAL(4, 2) NOT NULL DEFAULT 0.00,
-    created_at    TIMESTAMP NOT NULL DEFAULT NOW(),
+    total_reviews    BIGINT NOT NULL DEFAULT 0,
+    avg_score        DECIMAL(4, 2) NOT NULL DEFAULT 0.00,
+    avg_flavor       NUMERIC(4, 2) NOT NULL DEFAULT 0.00 CHECK(avg_flavor BETWEEN 0 AND 5),
+    avg_sauce        NUMERIC(4, 2) NOT NULL DEFAULT 0.00 CHECK(avg_sauce BETWEEN 0 AND 5),
+    avg_bread        NUMERIC(4, 2) NOT NULL DEFAULT 0.00 CHECK(avg_bread BETWEEN 0 AND 5),
+    avg_presentation NUMERIC(4, 2) NOT NULL DEFAULT 0.00 CHECK(avg_presentation BETWEEN 0 AND 5),
+    created_at       TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id)
 );
 

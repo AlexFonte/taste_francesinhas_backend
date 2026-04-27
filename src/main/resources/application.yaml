@@ -56,6 +56,6 @@ app:
     allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
   jwt:
     secret: ${JWT_SECRET}
-    expiration: 3600000 #1 hora
-    refresh-expiration: 604800000 #7 dias
+    expiration: 900000 #1 hora
+    refresh-expiration: 3600000 #604800000 #7 dias
 

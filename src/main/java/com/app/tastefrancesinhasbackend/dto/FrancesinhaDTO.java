@@ -49,6 +49,10 @@ public class FrancesinhaDTO {
             FrancesinhaStatus status,
             Long totalReviews,
             BigDecimal avgScore,
+            BigDecimal avgFlavor,
+            BigDecimal avgSauce,
+            BigDecimal avgBread,
+            BigDecimal avgPresentation,
             String proposedByEmail,
             LocalDateTime createdAt,
             RestaurantDTO.RestaurantResponse restaurant
@@ -67,6 +71,10 @@ public class FrancesinhaDTO {
                 f.getStatus(),
                 f.getTotalReviews(),
                 f.getAvgScore(),
+                f.getAvgFlavor(),
+                f.getAvgSauce(),
+                f.getAvgBread(),
+                f.getAvgPresentation(),
                 null,
                 f.getCreatedAt(),
                 RestaurantDTO.responsePublic(f.getRestaurant())
@@ -86,6 +94,10 @@ public class FrancesinhaDTO {
                 f.getStatus(),
                 f.getTotalReviews(),
                 f.getAvgScore(),
+                f.getAvgFlavor(),
+                f.getAvgSauce(),
+                f.getAvgBread(),
+                f.getAvgPresentation(),
                 f.getProposedBy().getEmail(),
                 f.getCreatedAt(),
                 RestaurantDTO.responsePrivate(f.getRestaurant())
