@@ -1,9 +1,11 @@
 package com.app.tastefrancesinhasbackend.controller;
 
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.AuthResponse;
+import com.app.tastefrancesinhasbackend.dto.AuthDTO.ChangePasswordRequest;
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.LoginRequest;
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.RefreshRequest;
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.RegisterRequest;
+import com.app.tastefrancesinhasbackend.dto.AuthDTO.UserStatsResponse;
 import com.app.tastefrancesinhasbackend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,5 +56,27 @@ public class  AuthController {
     @PostMapping(value = "/refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request));
+    }
+
+    @Operation(summary = "Cambiar contraseña", description = "Cambia la contraseña del usuario autenticado tras verificar la actual")
+    @ApiResponse(responseCode = "204", description = "Contraseña actualizada")
+    @ApiResponse(responseCode = "400", description = "Nueva contraseña no cumple los requisitos")
+    @ApiResponse(responseCode = "401", description = "No autenticado o contraseña actual incorrecta")
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> changePassword(Authentication authentication,
+                                               @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(authentication.getName(), request);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Devuelve solo sus propios contadores; no permitimos consultar las stats de otros usuarios.
+    @Operation(summary = "Estadisticas del usuario", description = "Devuelve el numero de reviews y propuestas del usuario autenticado")
+    @ApiResponse(responseCode = "200", description = "Estadisticas obtenidas")
+    @ApiResponse(responseCode = "401", description = "No autenticado")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me/stats")
+    public ResponseEntity<UserStatsResponse> getStats(Authentication authentication) {
+        return ResponseEntity.ok(authService.getStats(authentication.getName()));
     }
 }

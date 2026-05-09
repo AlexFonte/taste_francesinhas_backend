@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos - no requieren token
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/login", "/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.GET, "/restaurants", "/restaurants/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/francesinhas/pending", "/francesinhas/pending/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/francesinhas", "/francesinhas/**").permitAll()

@@ -6,12 +6,15 @@ import jakarta.validation.constraints.Pattern;
 
 public class AuthDTO{
 
+    public final static String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+    public final static String PASSWORD_ERROR_MSG = "La contraseña debe tener al menos 8 caracteres, una mayúscula y un número";
+
     public record RegisterRequest(
             @NotBlank String name,
             @NotBlank @Email String email,
             @NotBlank @Pattern(
-                    regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-                    message = "La contraseña debe tener al menos 8 caracteres, una mayúscula y un número"
+                    regexp = PASSWORD_PATTERN,
+                    message = PASSWORD_ERROR_MSG
             ) String password
     ) {}
 
@@ -31,5 +34,18 @@ public class AuthDTO{
 
     public record RefreshRequest(
             @NotBlank String refreshToken
+    ) {}
+
+    public record ChangePasswordRequest(
+            @NotBlank String currentPassword,
+            @NotBlank @Pattern(
+                    regexp = PASSWORD_PATTERN,
+                    message = PASSWORD_ERROR_MSG
+            ) String newPassword
+    ) {}
+
+    public record UserStatsResponse(
+            long reviewsCount,
+            long proposalsCount
     ) {}
 }

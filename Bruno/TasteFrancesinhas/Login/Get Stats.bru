@@ -1,0 +1,38 @@
+meta {
+  name: Get Stats
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{uri}}/auth/me/stats
+  body: none
+  auth: inherit
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Estadisticas del usuario autenticado. El email se extrae del JWT, no de la URL ni del body,
+  asi cada usuario solo ve sus propias cifras.
+
+  Respuesta 200 OK:
+  {
+    "reviewsCount": 12,
+    "proposalsCount": 5
+  }
+
+  Las propuestas se cuentan en cualquier estado (PENDING, ACCEPTED, REJECTED) porque al
+  usuario le interesa ver todo lo que ha enviado, no solo lo aprobado.
+
+  Respuestas:
+  - 200 OK: estadisticas obtenidas.
+  - 401 Unauthorized: sin token o token invalido/expirado.
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

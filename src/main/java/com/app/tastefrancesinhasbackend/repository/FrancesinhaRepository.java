@@ -33,6 +33,8 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
     // para mostrar los contadores (pendientes, aprobadas, rechazadas).
     long countByStatus(FrancesinhaStatus status);
 
+    long countByProposedById(Long userId);
+
     // Recalcula avg_score y las 4 medias por criterio sumando todas las reviews existentes (incluida la nueva).
     // Se ejecuta despues de guardar la review, dentro del mismo @Transactional. 
     // COALESCE para que cuand no hay reviews la columna NOT NULL no falle.
