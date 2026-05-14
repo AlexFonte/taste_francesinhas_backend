@@ -57,6 +57,15 @@ public class FrancesinhaService {
         return new StatsResponse(pending, accepted, rejected, pending + accepted + rejected);
     }
 
+    // Listado para el admin filtrado por estado (ACCEPTED o REJECTED). A diferencia del
+    // listado publico devolvemos responsePrivate para que el admin vea quien la propuso.
+    @Transactional(readOnly = true)
+    public Page<FrancesinhaResponse> findAllForAdmin(FrancesinhaStatus status, Pageable pageable) {
+        return francesinhaRepository.findAll(
+                        FrancesinhaSpec.withFilters(status, null, null, null, null), pageable)
+                .map(FrancesinhaDTO::responsePrivate);
+    }
+
     // Lista las francesinhas que el admin todavía no ha revisado.
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllPending(Pageable pageable) {

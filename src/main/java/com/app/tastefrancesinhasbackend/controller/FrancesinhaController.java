@@ -7,6 +7,7 @@ import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
 import com.app.tastefrancesinhasbackend.service.ReviewService;
 import com.app.tastefrancesinhasbackend.config.ApiConstants;
 import com.app.tastefrancesinhasbackend.dto.PageResponse;
+import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FrancesinhaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,6 +76,18 @@ public class FrancesinhaController {
     public ResponseEntity<Map<String, Object>> findAllPending(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllPending(pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
+    }
+
+    @Operation(summary = "Listar francesinhas por estado para el admin", description = "Solo ADMIN. Lista francesinhas filtradas por estado (ACCEPTED o REJECTED), paginadas.")
+    @ApiResponse(responseCode = "200", description = "Listado paginado")
+    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> findAllForAdmin(
+            @RequestParam FrancesinhaStatus status,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllForAdmin(status, pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
     }
 
     @Operation(summary = "Detalle de francesinha pendiente", description = "Solo ADMIN. Muestra detalle de francesinha con estado pendiente.")

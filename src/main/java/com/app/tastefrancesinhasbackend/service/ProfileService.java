@@ -43,11 +43,13 @@ public class ProfileService {
         return new UserStatsResponse(reviewsCount, proposalsCount);
     }
 
-    // Listado paginado de las reviews del usuario, con datos de la francesinha
+    // Listado paginado de las reviews del usuario, con datos de la francesinha.
+    // Solo devolvemos reviews de francesinhas ACCEPTED: en el perfil no tiene sentido
+    // mostrar valoraciones de propuestas que aun estan pendientes o han sido rechazadas.
     @Transactional(readOnly = true)
     public Page<MyReviewResponse> getMyReviews(String email, Pageable pageable) {
         User user = findUserByEmail(email);
-        return reviewRepository.findByUserId(user.getId(), pageable)
+        return reviewRepository.findByUserIdAndFrancesinhaStatus(user.getId(), FrancesinhaStatus.ACCEPTED, pageable)
                 .map(ProfileDTO::responseMyReview);
     }
 
