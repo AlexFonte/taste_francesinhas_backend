@@ -43,9 +43,4 @@ public class AuthDTO{
                     message = PASSWORD_ERROR_MSG
             ) String newPassword
     ) {}
-
-    public record UserStatsResponse(
-            long reviewsCount,
-            long proposalsCount
-    ) {}
 }

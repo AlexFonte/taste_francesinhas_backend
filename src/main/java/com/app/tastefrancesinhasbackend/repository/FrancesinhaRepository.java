@@ -35,6 +35,14 @@ public interface FrancesinhaRepository extends JpaRepository<Francesinha, Long>,
 
     long countByProposedById(Long userId);
 
+    // Propuestas del usuario (todos los estados) con restaurante cargado en el mismo JOIN
+    // para "/profile/proposals". Las dos firmas: con y sin filtro de estado.
+    @EntityGraph(attributePaths = {"restaurant"})
+    Page<Francesinha> findByProposedById(Long userId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"restaurant"})
+    Page<Francesinha> findByProposedByIdAndStatus(Long userId, FrancesinhaStatus status, Pageable pageable);
+
     // Recalcula avg_score y las 4 medias por criterio sumando todas las reviews existentes (incluida la nueva).
     // Se ejecuta despues de guardar la review, dentro del mismo @Transactional. 
     // COALESCE para que cuand no hay reviews la columna NOT NULL no falle.

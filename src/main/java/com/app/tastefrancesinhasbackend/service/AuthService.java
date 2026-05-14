@@ -5,13 +5,10 @@ import com.app.tastefrancesinhasbackend.dto.AuthDTO.ChangePasswordRequest;
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.LoginRequest;
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.RefreshRequest;
 import com.app.tastefrancesinhasbackend.dto.AuthDTO.RegisterRequest;
-import com.app.tastefrancesinhasbackend.dto.AuthDTO.UserStatsResponse;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.Role;
 import com.app.tastefrancesinhasbackend.exception.ConflictException;
 import com.app.tastefrancesinhasbackend.exception.UnauthorizedException;
-import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
-import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
 import com.app.tastefrancesinhasbackend.repository.UserRepository;
 import com.app.tastefrancesinhasbackend.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +23,6 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
-    private final FrancesinhaRepository francesinhaRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -119,16 +114,5 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
-    }
-
-    // ver todas las propuestas.
-    public UserStatsResponse getStats(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("Usuario no encontrado"));
-
-        long reviewsCount   = reviewRepository.countByUserId(user.getId());
-        long proposalsCount = francesinhaRepository.countByProposedById(user.getId());
-
-        return new UserStatsResponse(reviewsCount, proposalsCount);
     }
 }
