@@ -1,8 +1,9 @@
 package com.app.tastefrancesinhasbackend.controller;
 
-import com.app.tastefrancesinhasbackend.config.ApiConstants;
-import com.app.tastefrancesinhasbackend.dto.PageResponse;
+import com.app.tastefrancesinhasbackend.dto.ProfileDTO.MyReviewResponse;
 import com.app.tastefrancesinhasbackend.dto.ProfileDTO.UserStatsResponse;
+import com.app.tastefrancesinhasbackend.dto.ProposalsPageResponse;
+import com.app.tastefrancesinhasbackend.dto.ReviewsPageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,8 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,12 +48,9 @@ public class ProfileController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/reviews")
-    public ResponseEntity<Map<String, Object>> getMyReviews(Authentication auth,
+    public ResponseEntity<ReviewsPageResponse<MyReviewResponse>> getMyReviews(Authentication auth,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(
-                profileService.getMyReviews(auth.getName(), pageable),
-                ApiConstants.REVIEWS_CONTENT_KEY
-        ));
+        return ResponseEntity.ok(ReviewsPageResponse.of(profileService.getMyReviews(auth.getName(), pageable)));
     }
 
     @Operation(summary = "Listar mis propuestas", description = "Solo USER. Propuestas del usuario, todos los estados. Filtro opcional por status (PENDING, ACCEPTED, REJECTED).")
@@ -64,12 +60,9 @@ public class ProfileController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/proposals")
-    public ResponseEntity<Map<String, Object>> getMyProposals(Authentication auth,
+    public ResponseEntity<ProposalsPageResponse> getMyProposals(Authentication auth,
             @RequestParam(required = false) FrancesinhaStatus status,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(
-                profileService.getMyProposals(auth.getName(), status, pageable),
-                ApiConstants.PROPOSALS_CONTENT_KEY
-        ));
+        return ResponseEntity.ok(ProposalsPageResponse.of(profileService.getMyProposals(auth.getName(), status, pageable)));
     }
 }

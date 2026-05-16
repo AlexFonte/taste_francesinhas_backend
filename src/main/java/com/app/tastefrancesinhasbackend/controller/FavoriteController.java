@@ -1,8 +1,7 @@
 package com.app.tastefrancesinhasbackend.controller;
 
-import com.app.tastefrancesinhasbackend.config.ApiConstants;
 import com.app.tastefrancesinhasbackend.dto.FavoriteDTO.ToggleResponse;
-import com.app.tastefrancesinhasbackend.dto.PageResponse;
+import com.app.tastefrancesinhasbackend.dto.FavoritesPageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,13 +35,13 @@ public class FavoriteController {
     @ApiResponse(responseCode = "403", description = "Solo usuarios con rol USER")
     @GetMapping(value = {"", "/"})
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Map<String, Object>> findAll(
+    public ResponseEntity<FavoritesPageResponse> findAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) FrancesinhaType type,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication auth) {
-        return ResponseEntity.ok(PageResponse.of(favoriteService.findByUser(name, city, type, pageable, auth), ApiConstants.FAVORITES_CONTENT_KEY));
+        return ResponseEntity.ok(FavoritesPageResponse.of(favoriteService.findByUser(name, city, type, pageable, auth)));
     }
 
     @Operation(summary = "Comprobar si una francesinha esta como favorita", description = "Solo USER.")

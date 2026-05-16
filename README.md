@@ -129,7 +129,7 @@ docker logs -f tastefrancesinha_db
 
 ```
 src/main/java/com/app/tastefrancesinhasbackend/
-|__ config/          # SecurityConfig, ApiConstants
+|__ config/          # SecurityConfig
 |__ controller/      # AuthController, FrancesinhaController, ReviewController, ...
 |__ dto/             # Records de entrada/salida (FrancesinhaDTO, AuthDTO, ...)
 |__ entity/          # Entidades JPA (User, Francesinha, Restaurant, Review, Favorite)

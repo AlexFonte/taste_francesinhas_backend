@@ -1,9 +1,8 @@
 package com.app.tastefrancesinhasbackend.controller;
 
-import com.app.tastefrancesinhasbackend.config.ApiConstants;
-import com.app.tastefrancesinhasbackend.dto.PageResponse;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewRequest;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
+import com.app.tastefrancesinhasbackend.dto.ReviewsPageResponse;
 import com.app.tastefrancesinhasbackend.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,8 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping(value = "/francesinhas/{francesinhaId}/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -35,9 +32,9 @@ public class ReviewController {
     @ApiResponse(responseCode = "200", description = "Lista de reviews")
     @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @GetMapping
-    public ResponseEntity<Map<String, Object>> findAll(@PathVariable Long francesinhaId,
+    public ResponseEntity<ReviewsPageResponse<ReviewResponse>> findAll(@PathVariable Long francesinhaId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(reviewService.findByFrancesinha(francesinhaId, pageable), ApiConstants.REVIEWS_CONTENT_KEY));
+        return ResponseEntity.ok(ReviewsPageResponse.of(reviewService.findByFrancesinha(francesinhaId, pageable)));
     }
 
     @Operation(summary = "Publicar una review", description = "Solo USER. Un usuario puede publicar múltiples reviews sobre la misma francesinha.")

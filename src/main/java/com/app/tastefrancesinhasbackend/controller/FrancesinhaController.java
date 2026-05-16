@@ -4,12 +4,13 @@ import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaRequest;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaResponse;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaStatusRequest;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
-import com.app.tastefrancesinhasbackend.service.ReviewService;
-import com.app.tastefrancesinhasbackend.config.ApiConstants;
-import com.app.tastefrancesinhasbackend.dto.PageResponse;
+import com.app.tastefrancesinhasbackend.dto.FrancesinhasPageResponse;
+import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
+import com.app.tastefrancesinhasbackend.dto.ReviewsPageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FrancesinhaService;
+import com.app.tastefrancesinhasbackend.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,8 +27,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping(value = "/francesinhas", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -40,13 +39,13 @@ public class FrancesinhaController {
     @Operation(summary = "Listar francesinhas aceptadas", description = "Filtros opcionales: name, city, type, restaurantId.")
     @ApiResponse(responseCode = "200", description = "Listado paginado")
     @GetMapping(value = {"", "/"})
-    public ResponseEntity<Map<String, Object>> findAll(
+    public ResponseEntity<FrancesinhasPageResponse> findAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) FrancesinhaType type,
             @RequestParam(required = false) Long restaurantId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllAccepted(name, city, type, restaurantId, pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
+        return ResponseEntity.ok(FrancesinhasPageResponse.of(francesinhaService.findAllAccepted(name, city, type, restaurantId, pageable)));
     }
 
     @Operation(summary = "Detalle de una francesinha", description = "Público. 404 si no existe o no está aprobada.")
@@ -73,9 +72,9 @@ public class FrancesinhaController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> findAllPending(
+    public ResponseEntity<FrancesinhasPageResponse> findAllPending(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllPending(pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
+        return ResponseEntity.ok(FrancesinhasPageResponse.of(francesinhaService.findAllPending(pageable)));
     }
 
     @Operation(summary = "Listar francesinhas por estado para el admin", description = "Solo ADMIN. Lista francesinhas filtradas por estado (ACCEPTED o REJECTED), paginadas.")
@@ -84,10 +83,10 @@ public class FrancesinhaController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> findAllForAdmin(
+    public ResponseEntity<FrancesinhasPageResponse> findAllForAdmin(
             @RequestParam FrancesinhaStatus status,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(francesinhaService.findAllForAdmin(status, pageable), ApiConstants.FRANCESINHAS_CONTENT_KEY));
+        return ResponseEntity.ok(FrancesinhasPageResponse.of(francesinhaService.findAllForAdmin(status, pageable)));
     }
 
     @Operation(summary = "Detalle de francesinha pendiente", description = "Solo ADMIN. Muestra detalle de francesinha con estado pendiente.")
@@ -121,9 +120,9 @@ public class FrancesinhaController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/pending/{id}/reviews")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> findReviewsForAdmin(@PathVariable Long id,
+    public ResponseEntity<ReviewsPageResponse<ReviewResponse>> findReviewsForAdmin(@PathVariable Long id,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(reviewService.findByFrancesinhaForAdmin(id, pageable), ApiConstants.REVIEWS_CONTENT_KEY));
+        return ResponseEntity.ok(ReviewsPageResponse.of(reviewService.findByFrancesinhaForAdmin(id, pageable)));
     }
 
     @Operation(summary = "Aprobar o rechazar francesinha", description = "Solo ADMIN. Cambia el estado a ACCEPTED o REJECTED.")
