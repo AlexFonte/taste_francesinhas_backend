@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class FrancesinhaDTO {
 
@@ -54,11 +55,13 @@ public class FrancesinhaDTO {
             BigDecimal avgBread,
             BigDecimal avgPresentation,
             String proposedByEmail,
+            String coverPhotoUrl,
+            List<String> photoUrls,
             LocalDateTime createdAt,
             RestaurantDTO.RestaurantResponse restaurant
     ) {}
 
-    public static FrancesinhaResponse responsePublic(Francesinha f) {
+    public static FrancesinhaResponse responsePublic(Francesinha f, String coverPhotoUrl, List<String> photoUrls) {
         return new FrancesinhaResponse(
                 f.getId(),
                 f.getName(),
@@ -76,12 +79,14 @@ public class FrancesinhaDTO {
                 f.getAvgBread(),
                 f.getAvgPresentation(),
                 null,
+                coverPhotoUrl,
+                photoUrls,
                 f.getCreatedAt(),
                 RestaurantDTO.responsePublic(f.getRestaurant())
         );
     }
 
-    public static FrancesinhaResponse responsePrivate(Francesinha f) {
+    public static FrancesinhaResponse responsePrivate(Francesinha f, String coverPhotoUrl, List<String> photoUrls) {
         return new FrancesinhaResponse(
                 f.getId(),
                 f.getName(),
@@ -99,6 +104,8 @@ public class FrancesinhaDTO {
                 f.getAvgBread(),
                 f.getAvgPresentation(),
                 f.getProposedBy().getEmail(),
+                coverPhotoUrl,
+                photoUrls,
                 f.getCreatedAt(),
                 RestaurantDTO.responsePrivate(f.getRestaurant())
         );

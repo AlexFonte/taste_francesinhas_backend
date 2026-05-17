@@ -1,0 +1,26 @@
+meta {
+  name: review with photo
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/tastefrancesinhas/francesinhas/53/reviews
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Content-Type: multipart/form-data
+  Authorization: Bearer {{authToken}}
+}
+
+body:multipart-form {
+  review: {"scoreFlavor":5,"scoreSauce":4,"scoreBread":5,"scorePresentation":5,"comment":"Con foto"} @contentType(application/json)
+  file: @file(C:\Users\Lequio_Fonte\Desktop\IMG_20220801_215103.jpg)
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

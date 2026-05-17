@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class ReviewDTO {
             BigDecimal avgScore,
             String comment,
             String userName,
+            String photoUrl,
             LocalDateTime createdAt
     ) {}
 
@@ -47,6 +49,7 @@ public class ReviewDTO {
                 r.getAvgScore(),
                 r.getComment(),
                 r.getUser().getName(),
+                r.getPhotoUrl(),
                 r.getCreatedAt()
         );
     }

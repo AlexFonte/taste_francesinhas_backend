@@ -14,6 +14,7 @@ import com.app.tastefrancesinhasbackend.exception.BadRequestException;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
+import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
 import com.app.tastefrancesinhasbackend.spec.FrancesinhaSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,28 +24,39 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class FrancesinhaService {
 
     private final FrancesinhaRepository francesinhaRepository;
     private final RestaurantRepository restaurantRepository;
+    private final ReviewRepository reviewRepository;
 
     // Devuelve las francesinhas aprobadas. Los filtros son opcionales: sin ninguno hya filtros, devuelve todas.
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllAccepted(String name, String city, FrancesinhaType type,
                                                      Long restaurantId, Pageable pageable) {
         Specification<Francesinha> spec = FrancesinhaSpec.withFilters(FrancesinhaStatus.ACCEPTED, name, type, city, restaurantId);
-        return francesinhaRepository.findAll(spec, pageable)
-                .map(FrancesinhaDTO::responsePublic);
+        Page<Francesinha> page = francesinhaRepository.findAll(spec, pageable);
+        Map<Long, String> covers = fetchCoverPhotos(page.getContent().stream().map(Francesinha::getId).toList());
+        return page.map(f -> FrancesinhaDTO.responsePublic(f, covers.get(f.getId()), null));
     }
 
     // Busca una francesinha aprobada por id. Si no existe o no está aprobada, lanza 404.
+    // En el detalle devolvemos TODAS las URLs de fotos de las reviews para alimentar el carrusel,
+    // independientemente de la paginacion del endpoint de reviews.
     @Transactional(readOnly = true)
     public FrancesinhaResponse findById(Long id) {
-        return francesinhaRepository.findByIdAndStatus(id, FrancesinhaStatus.ACCEPTED)
-                .map(FrancesinhaDTO::responsePublic)
+        Francesinha francesinha = francesinhaRepository.findByIdAndStatus(id, FrancesinhaStatus.ACCEPTED)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
+        String coverPhotoUrl = fetchCoverPhotos(List.of(id)).get(id);
+        List<String> photoUrls = reviewRepository.findPhotoUrlsByFrancesinhaId(id);
+        return FrancesinhaDTO.responsePublic(francesinha, coverPhotoUrl, photoUrls);
     }
 
     // Contadores agregados para el dashboard de admin: pendientes, aprobadas, rechazadas y total.
@@ -61,25 +73,29 @@ public class FrancesinhaService {
     // listado publico devolvemos responsePrivate para que el admin vea quien la propuso.
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllForAdmin(FrancesinhaStatus status, Pageable pageable) {
-        return francesinhaRepository.findAll(
-                        FrancesinhaSpec.withFilters(status, null, null, null, null), pageable)
-                .map(FrancesinhaDTO::responsePrivate);
+        Page<Francesinha> page = francesinhaRepository.findAll(
+                FrancesinhaSpec.withFilters(status, null, null, null, null), pageable);
+        Map<Long, String> covers = fetchCoverPhotos(page.getContent().stream().map(Francesinha::getId).toList());
+        return page.map(f -> FrancesinhaDTO.responsePrivate(f, covers.get(f.getId()), null));
     }
 
     // Lista las francesinhas que el admin todavía no ha revisado.
     @Transactional(readOnly = true)
     public Page<FrancesinhaResponse> findAllPending(Pageable pageable) {
-        return francesinhaRepository.findAll(
-                        FrancesinhaSpec.withFilters(FrancesinhaStatus.PENDING, null, null, null, null), pageable)
-                .map(FrancesinhaDTO::responsePrivate);
+        Page<Francesinha> page = francesinhaRepository.findAll(
+                FrancesinhaSpec.withFilters(FrancesinhaStatus.PENDING, null, null, null, null), pageable);
+        Map<Long, String> covers = fetchCoverPhotos(page.getContent().stream().map(Francesinha::getId).toList());
+        return page.map(f -> FrancesinhaDTO.responsePrivate(f, covers.get(f.getId()), null));
     }
 
     // Igual que findById pero sin filtrar por estado, para que el admin pueda ver cualquier francesinha.
     @Transactional(readOnly = true)
     public FrancesinhaResponse findByIdForAdmin(Long id) {
-        return francesinhaRepository.findById(id)
-                .map(FrancesinhaDTO::responsePrivate)
+        Francesinha francesinha = francesinhaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
+        String coverPhotoUrl = fetchCoverPhotos(List.of(id)).get(id);
+        List<String> photoUrls = reviewRepository.findPhotoUrlsByFrancesinhaId(id);
+        return FrancesinhaDTO.responsePrivate(francesinha, coverPhotoUrl, photoUrls);
     }
 
     // El admin aprueba o rechaza una francesinha pendiente. No se puede volver a poner en PENDING.
@@ -103,7 +119,9 @@ public class FrancesinhaService {
             }
         }
 
-        return FrancesinhaDTO.responsePrivate(francesinhaRepository.save(francesinha));
+        Francesinha saved = francesinhaRepository.save(francesinha);
+        String coverPhotoUrl = fetchCoverPhotos(List.of(saved.getId())).get(saved.getId());
+        return FrancesinhaDTO.responsePrivate(saved, coverPhotoUrl, null);
     }
 
     // Un usuario propone una nueva francesinha. Queda en PENDING hasta que un admin la revise.
@@ -126,6 +144,19 @@ public class FrancesinhaService {
                 .type(request.type())
                 .build();
 
-        return FrancesinhaDTO.responsePublic(francesinhaRepository.save(francesinha));
+        return FrancesinhaDTO.responsePublic(francesinhaRepository.save(francesinha), null, null);
+    }
+
+    // Una sola query nativa con ROW_NUMBER() saca la foto mas reciente por francesinha.
+    // Mapeamos el List<Object[]> a Map<francesinhaId, photoUrl>.
+    private Map<Long, String> fetchCoverPhotos(Collection<Long> francesinhaIds) {
+        if (francesinhaIds.isEmpty()) {
+            return Map.of();
+        }
+        return reviewRepository.findCoverPhotoUrlsByFrancesinhaIds(francesinhaIds).stream()
+                .collect(Collectors.toMap(
+                        row -> ((Number) row[0]).longValue(),
+                        row -> (String) row[1]
+                ));
     }
 }

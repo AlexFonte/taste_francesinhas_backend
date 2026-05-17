@@ -27,6 +27,12 @@ spring:
     virtual:
       enabled: true
 
+  # Spring por defecto limita multipart a 1MB. Subimos a 5MB que es el limite tambien validado en el frontend.
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 server:
   port: ${PORT:8080}
   servlet:
@@ -58,4 +64,13 @@ app:
     secret: ${JWT_SECRET}
     expiration: 900000 #1 hora
     refresh-expiration: 3600000 #604800000 #7 dias
+
+supabase:
+  url: ${SUPABASE_URL}
+  bucket: ${SUPABASE_BUCKET}
+  s3:
+    endpoint: ${SUPABASE_S3_ENDPOINT}
+    region: ${SUPABASE_S3_REGION}
+    access-key: ${SUPABASE_S3_ACCESS_KEY}
+    secret-key: ${SUPABASE_S3_SECRET_KEY}
 

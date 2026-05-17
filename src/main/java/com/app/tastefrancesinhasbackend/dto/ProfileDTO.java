@@ -27,6 +27,7 @@ public class ProfileDTO {
             Short scorePresentation,
             BigDecimal avgScore,
             String comment,
+            String photoUrl,
             LocalDateTime createdAt,
             Long francesinhaId,
             String francesinhaName,
@@ -44,6 +45,7 @@ public class ProfileDTO {
                 r.getScorePresentation(),
                 r.getAvgScore(),
                 r.getComment(),
+                r.getPhotoUrl(),
                 r.getCreatedAt(),
                 r.getFrancesinha().getId(),
                 r.getFrancesinha().getName(),
@@ -85,6 +87,7 @@ public class ProfileDTO {
             Short scorePresentation,
             BigDecimal avgScore,
             String comment,
+            String photoUrl,
             LocalDateTime createdAt
     ) {}
 
@@ -120,6 +123,7 @@ public class ProfileDTO {
                 r.getScorePresentation(),
                 r.getAvgScore(),
                 r.getComment(),
+                r.getPhotoUrl(),
                 r.getCreatedAt()
         );
     }

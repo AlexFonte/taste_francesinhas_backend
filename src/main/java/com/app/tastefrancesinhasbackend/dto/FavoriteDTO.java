@@ -17,10 +17,10 @@ public class FavoriteDTO {
             Long francesinhaId
     ) {}
 
-    public static FavoriteResponse response(Favorite f) {
+    public static FavoriteResponse response(Favorite f, String coverPhotoUrl) {
         return new FavoriteResponse(
                 f.getId(),
-                FrancesinhaDTO.responsePublic(f.getFrancesinha()),
+                FrancesinhaDTO.responsePublic(f.getFrancesinha(), coverPhotoUrl, null),
                 f.getCreatedAt()
         );
     }
