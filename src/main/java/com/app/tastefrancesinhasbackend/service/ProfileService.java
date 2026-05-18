@@ -8,10 +8,12 @@ import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.Review;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
+import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.exception.UnauthorizedException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
 import com.app.tastefrancesinhasbackend.repository.UserRepository;
+import com.app.tastefrancesinhasbackend.spec.MyReviewSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,11 +47,11 @@ public class ProfileService {
 
     // Listado paginado de las reviews del usuario, con datos de la francesinha.
     // Solo devolvemos reviews de francesinhas ACCEPTED: en el perfil no tiene sentido
-    // mostrar valoraciones de propuestas que aun estan pendientes o han sido rechazadas.
+    // mostrar valoraciones de propuestas que aun estan pendientes o han sido rechazadas y con el filtro
     @Transactional(readOnly = true)
-    public Page<MyReviewResponse> getMyReviews(String email, Pageable pageable) {
+    public Page<MyReviewResponse> getMyReviews(String email, String name, FrancesinhaType type, String city, Pageable pageable) {
         User user = findUserByEmail(email);
-        return reviewRepository.findByUserIdAndFrancesinhaStatus(user.getId(), FrancesinhaStatus.ACCEPTED, pageable)
+        return reviewRepository.findAll(MyReviewSpec.withFilters(user.getId(), name, type, city), pageable)
                 .map(ProfileDTO::responseMyReview);
     }
 

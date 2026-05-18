@@ -5,6 +5,7 @@ import com.app.tastefrancesinhasbackend.dto.ProfileDTO.UserStatsResponse;
 import com.app.tastefrancesinhasbackend.dto.ProposalsPageResponse;
 import com.app.tastefrancesinhasbackend.dto.ReviewsPageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
+import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,8 +50,11 @@ public class ProfileController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/reviews")
     public ResponseEntity<ReviewsPageResponse<MyReviewResponse>> getMyReviews(Authentication auth,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) FrancesinhaType type,
+            @RequestParam(required = false) String city,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ReviewsPageResponse.of(profileService.getMyReviews(auth.getName(), pageable)));
+        return ResponseEntity.ok(ReviewsPageResponse.of(profileService.getMyReviews(auth.getName(), name, type, city, pageable)));
     }
 
     @Operation(summary = "Listar mis propuestas", description = "Solo USER. Propuestas del usuario, todos los estados. Filtro opcional por status (PENDING, ACCEPTED, REJECTED).")

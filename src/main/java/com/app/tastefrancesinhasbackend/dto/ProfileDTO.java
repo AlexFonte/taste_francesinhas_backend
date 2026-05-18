@@ -31,6 +31,7 @@ public class ProfileDTO {
             LocalDateTime createdAt,
             Long francesinhaId,
             String francesinhaName,
+            FrancesinhaType francesinhaType,
             FrancesinhaStatus francesinhaStatus,
             String restaurantName,
             String restaurantCity
@@ -49,6 +50,7 @@ public class ProfileDTO {
                 r.getCreatedAt(),
                 r.getFrancesinha().getId(),
                 r.getFrancesinha().getName(),
+                r.getFrancesinha().getType(),
                 r.getFrancesinha().getStatus(),
                 r.getFrancesinha().getRestaurant().getName(),
                 r.getFrancesinha().getRestaurant().getCity()
