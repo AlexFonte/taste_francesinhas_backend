@@ -7,12 +7,12 @@ import com.app.tastefrancesinhasbackend.entity.Restaurant;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
+import com.app.tastefrancesinhasbackend.security.CurrentUserContext;
 import com.app.tastefrancesinhasbackend.spec.RestaurantSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final CurrentUserContext currentUser;
 
     // Lista todos los restaurantes. Se puede filtrar por nombre o ciudad.
     @Transactional(readOnly = true)
@@ -41,8 +42,8 @@ public class RestaurantService {
 
     // Registra un restaurante nuevo. Guarda quién lo propuso, pero eso no implica permisos especiales.
     @Transactional
-    public RestaurantResponse create(RestaurantRequest request, Authentication auth) {
-        User proposedBy = (User) auth.getPrincipal();
+    public RestaurantResponse create(RestaurantRequest request) {
+        User proposedBy = currentUser.getUser();
         return RestaurantDTO.responsePublic(restaurantRepository.save(buildRestaurant(request, proposedBy)));
     }
 

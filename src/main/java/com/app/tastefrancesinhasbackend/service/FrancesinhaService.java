@@ -15,12 +15,12 @@ import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.RestaurantRepository;
 import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
+import com.app.tastefrancesinhasbackend.security.CurrentUserContext;
 import com.app.tastefrancesinhasbackend.spec.FrancesinhaSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +36,7 @@ public class FrancesinhaService {
     private final FrancesinhaRepository francesinhaRepository;
     private final RestaurantRepository restaurantRepository;
     private final ReviewRepository reviewRepository;
+    private final CurrentUserContext currentUser;
 
     // Devuelve las francesinhas aprobadas. Los filtros son opcionales: sin ninguno hya filtros, devuelve todas.
     @Transactional(readOnly = true)
@@ -126,8 +127,8 @@ public class FrancesinhaService {
 
     // Un usuario propone una nueva francesinha. Queda en PENDING hasta que un admin la revise.
     @Transactional
-    public FrancesinhaResponse propose(FrancesinhaRequest request, Authentication auth) {
-        User proposedBy = (User) auth.getPrincipal();
+    public FrancesinhaResponse propose(FrancesinhaRequest request) {
+        User proposedBy = currentUser.getUser();
 
         Restaurant restaurant = restaurantRepository.findById(request.restaurantId())
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurante no encontrado: " + request.restaurantId()));

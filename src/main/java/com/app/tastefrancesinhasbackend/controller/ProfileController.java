@@ -18,7 +18,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,8 +37,8 @@ public class ProfileController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/stats")
-    public ResponseEntity<UserStatsResponse> getStats(Authentication auth) {
-        return ResponseEntity.ok(profileService.getStats(auth.getName()));
+    public ResponseEntity<UserStatsResponse> getStats() {
+        return ResponseEntity.ok(profileService.getStats());
     }
 
     @Operation(summary = "Listar mis reviews", description = "Solo USER. Reviews del usuario con datos minimos de la francesinha valorada.")
@@ -49,12 +48,12 @@ public class ProfileController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/reviews")
-    public ResponseEntity<ReviewsPageResponse<MyReviewResponse>> getMyReviews(Authentication auth,
+    public ResponseEntity<ReviewsPageResponse<MyReviewResponse>> getMyReviews(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) FrancesinhaType type,
             @RequestParam(required = false) String city,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ReviewsPageResponse.of(profileService.getMyReviews(auth.getName(), name, type, city, pageable)));
+        return ResponseEntity.ok(ReviewsPageResponse.of(profileService.getMyReviews(name, type, city, pageable)));
     }
 
     @Operation(summary = "Listar mis propuestas", description = "Solo USER. Propuestas del usuario, todos los estados. Filtro opcional por status (PENDING, ACCEPTED, REJECTED).")
@@ -64,9 +63,9 @@ public class ProfileController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/proposals")
-    public ResponseEntity<ProposalsPageResponse> getMyProposals(Authentication auth,
+    public ResponseEntity<ProposalsPageResponse> getMyProposals(
             @RequestParam(required = false) FrancesinhaStatus status,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ProposalsPageResponse.of(profileService.getMyProposals(auth.getName(), status, pageable)));
+        return ResponseEntity.ok(ProposalsPageResponse.of(profileService.getMyProposals(status, pageable)));
     }
 }

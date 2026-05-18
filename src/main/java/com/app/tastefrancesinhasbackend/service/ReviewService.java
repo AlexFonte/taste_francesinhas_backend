@@ -5,16 +5,15 @@ import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewRequest;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
 import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.Review;
-import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.exception.BadRequestException;
 import com.app.tastefrancesinhasbackend.exception.ResourceNotFoundException;
 import com.app.tastefrancesinhasbackend.repository.FrancesinhaRepository;
 import com.app.tastefrancesinhasbackend.repository.ReviewRepository;
+import com.app.tastefrancesinhasbackend.security.CurrentUserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +41,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final FrancesinhaRepository francesinhaRepository;
     private final SupabaseStorageService supabaseStorageService;
+    private final CurrentUserContext currentUser;
 
     @Transactional(readOnly = true)
     public Page<ReviewResponse> findByFrancesinha(Long francesinhaId, Pageable pageable) {
@@ -67,13 +67,11 @@ public class ReviewService {
     // POST /francesinhas/{id}/reviews - autenticado, crea una review con foto opcional.
     // Si la subida a Supabase falla, @Transactional revierte el save de la review -> nada queda en BD.
     @Transactional
-    public ReviewResponse create(Long francesinhaId, ReviewRequest request, MultipartFile file, Authentication auth) {
+    public ReviewResponse create(Long francesinhaId, ReviewRequest request, MultipartFile file) {
         // Validamos la foto ANTES de tocar BD para fail-fast (sin crear review si la foto no es valida).
         if (file != null && !file.isEmpty() && !isValidPhoto(file)) {
             throw new BadRequestException("Tipo de archivo no soportado. Solo JPG, JPEG, PNG o WebP.");
         }
-
-        User user = (User) auth.getPrincipal();
 
         // Si la review viene del flujo de proponer, la francesinha esta PENDING; si no, ACCEPTED.
         FrancesinhaStatus searchByStatus = Boolean.TRUE.equals(request.propuesta())
@@ -89,7 +87,7 @@ public class ReviewService {
 
         Review review = Review.builder()
                 .francesinha(francesinha)
-                .user(user)
+                .user(currentUser.getUser())
                 .scoreFlavor(request.scoreFlavor())
                 .scoreSauce(request.scoreSauce())
                 .scoreBread(request.scoreBread())

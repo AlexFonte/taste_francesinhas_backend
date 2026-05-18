@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -108,9 +107,8 @@ public class FrancesinhaController {
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping(value = "/propose", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<FrancesinhaResponse> propose(@Valid @RequestBody FrancesinhaRequest request,
-                                                       Authentication auth) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(francesinhaService.propose(request, auth));
+    public ResponseEntity<FrancesinhaResponse> propose(@Valid @RequestBody FrancesinhaRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(francesinhaService.propose(request));
     }
 
     @Operation(summary = "Listar reviews de una francesinha pendiente", description = "Solo ADMIN. Devuelve las reviews sin filtrar por estado de la francesinha (la review que dejó el proponente cuando creó la propuesta).")

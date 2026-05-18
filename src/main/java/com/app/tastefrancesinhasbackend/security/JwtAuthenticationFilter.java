@@ -1,5 +1,7 @@
 package com.app.tastefrancesinhasbackend.security;
 
+import com.app.tastefrancesinhasbackend.entity.enums.Role;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,21 +9,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -42,23 +43,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String token = authHeader.substring(7);
 
         try {
-            final String email = jwtService.extractUsername(token);
+            // Parseamos el token UNA vez: valida firma y caducidad. Si falla salta excepcion y
+            // dejamos pasar el request sin autenticar (Spring devolvera 401 si el endpoint lo requiere).
+            Claims claims = jwtService.parseAndValidate(token);
 
-            // evita re-autenticar si ya hay sesión activa en este request
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            // Rechazamos los refresh tokens explicitamente: solo los access valen como autenticacion.
+            if ("refresh".equals(claims.get("type", String.class))) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-                if (jwtService.isValid(token, userDetails)) {
-                    // a partir de aquí Spring conoce al usuario en este request
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+            // Evita re-autenticar si ya hay sesion activa en esta request.
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                Long   uid   = claims.get("uid", Long.class);
+                String email = claims.getSubject();
+                Role   role  = Role.valueOf(claims.get("role", String.class));
+
+                // Construimos el AutneitcaetedIUser sin tocar BD. Los services que necesiten la
+                AuthenticatedUser authenticatedUser = new AuthenticatedUser(uid, email, role);
+
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                authenticatedUser,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + role.name())));
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception ignored) {
-            // token inválido o expirado - Spring devolverá 401 si el endpoint lo requiere
+            // token invalido, expirado o sin los claims esperados - Spring devolvera 401 si el endpoint lo requiere
         }
 
         filterChain.doFilter(request, response);

@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,9 +61,8 @@ public class  AuthController {
     @ApiResponse(responseCode = "401", description = "No autenticado o contraseña actual incorrecta")
     @PreAuthorize("isAuthenticated()")
     @PatchMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> changePassword(Authentication authentication,
-                                               @Valid @RequestBody ChangePasswordRequest request) {
-        authService.changePassword(authentication.getName(), request);
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(request);
         return ResponseEntity.noContent().build();
     }
 }

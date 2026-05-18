@@ -10,7 +10,9 @@ import com.app.tastefrancesinhasbackend.entity.enums.Role;
 import com.app.tastefrancesinhasbackend.exception.ConflictException;
 import com.app.tastefrancesinhasbackend.exception.UnauthorizedException;
 import com.app.tastefrancesinhasbackend.repository.UserRepository;
+import com.app.tastefrancesinhasbackend.security.CurrentUserContext;
 import com.app.tastefrancesinhasbackend.security.JwtService;
+import com.app.tastefrancesinhasbackend.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final CurrentUserContext currentUser;
 
     // Crea el usuario con rol USER, lo guarda y devuelve tokens listos para usar.
     // Así el cliente puede empezar sin tener que hacer, ya que se hara un "autologin".
@@ -43,9 +46,11 @@ public class AuthService {
 
         userRepository.save(user);
 
+        CustomUserDetails customUserDetails = CustomUserDetails.from(user);
+
         return new AuthResponse(
-                jwtService.generateAccessToken(user),
-                jwtService.generateRefreshToken(user),
+                jwtService.generateAccessToken(customUserDetails),
+                jwtService.generateRefreshToken(customUserDetails),
                 user.getName(),
                 user.getEmail(),
                 user.getRole().name(),
@@ -66,14 +71,16 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("Usuario no encontrado"));
 
-        if (!jwtService.isValidRefreshToken(request.refreshToken(), user)) {
+        CustomUserDetails customUserDetails = CustomUserDetails.from(user);
+
+        if (!jwtService.isValidRefreshToken(request.refreshToken(), customUserDetails)) {
             throw new UnauthorizedException("Refresh token inválido o expirado");
         }
 
         // Emitimos un nuevo par de tokens
         return new AuthResponse(
-                jwtService.generateAccessToken(user),
-                jwtService.generateRefreshToken(user),
+                jwtService.generateAccessToken(customUserDetails),
+                jwtService.generateRefreshToken(customUserDetails),
                 user.getName(),
                 user.getEmail(),
                 user.getRole().name(),
@@ -81,7 +88,7 @@ public class AuthService {
         );
     }
 
-    // Spring Security verifica email + bcrypt. Si pasa, extraemos el usuario del resultado.
+    // Spring Security verifica email + bcrypt. Si pasa, extraemos el customUserDetails del resultado.
     public AuthResponse login(LoginRequest request) {
         // Delega en Spring Security la verificación de email + password con bcrypt
         // Si falla lanza BadCredentialsException --> capturada por GlobalExceptionHandler --> 401
@@ -89,24 +96,24 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
-        // El User ya fue cargado de BD por UserDetailsServiceImpl durante la autenticación
-        User user = (User) authResult.getPrincipal();
+        // El CustomUserDetails lo construyo UserDetailsServiceImpl durante la autenticacion a partir
+        // del User cargado de BD.
+        CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
 
         return new AuthResponse(
-                jwtService.generateAccessToken(user),
-                jwtService.generateRefreshToken(user),
-                user.getName(),
-                user.getEmail(),
-                user.getRole().name(),
-                user.getId()
+                jwtService.generateAccessToken(customUserDetails),
+                jwtService.generateRefreshToken(customUserDetails),
+                customUserDetails.name(),
+                customUserDetails.email(),
+                customUserDetails.role().name(),
+                customUserDetails.id()
         );
     }
 
-    // Cambio de contraseña, se recupera el usuario de base de datos,
-    // se verifica que la contraseña orignal sea la misma uqe la de bd, si es igual se procedes a actualizar la contraseña
-    public void changePassword(String email, ChangePasswordRequest request) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("Usuario no encontrado"));
+    // Cambio de contraseña: recupera el User actual via CurrentUserContext,
+    // verifica la contraseña actual contra el bcrypt en BD y, si coincide, actualiza al hash nuevo.
+    public void changePassword(ChangePasswordRequest request) {
+        User user = currentUser.getUser();
 
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new UnauthorizedException("La contraseña actual no es correcta");

@@ -15,7 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -39,16 +38,15 @@ public class FavoriteController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) FrancesinhaType type,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            Authentication auth) {
-        return ResponseEntity.ok(FavoritesPageResponse.of(favoriteService.findByUser(name, city, type, pageable, auth)));
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(FavoritesPageResponse.of(favoriteService.findByUser(name, city, type, pageable)));
     }
 
     @Operation(summary = "Comprobar si una francesinha esta como favorita", description = "Solo USER.")
     @GetMapping("/{francesinhaId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Map<String, Boolean>> isFavorite(@PathVariable Long francesinhaId, Authentication auth) {
-        return ResponseEntity.ok(Map.of("isFavorite", favoriteService.isFavorite(francesinhaId, auth)));
+    public ResponseEntity<Map<String, Boolean>> isFavorite(@PathVariable Long francesinhaId) {
+        return ResponseEntity.ok(Map.of("isFavorite", favoriteService.isFavorite(francesinhaId)));
     }
 
     @Operation(summary = "Toggle favorito", description = "Solo USER. Añade la francesinha a favoritos si no estaba; la elimina si ya estaba.")
@@ -58,7 +56,7 @@ public class FavoriteController {
     @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @PostMapping("/{francesinhaId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ToggleResponse> toggle(@PathVariable Long francesinhaId, Authentication auth) {
-        return ResponseEntity.ok(favoriteService.toggle(francesinhaId, auth));
+    public ResponseEntity<ToggleResponse> toggle(@PathVariable Long francesinhaId) {
+        return ResponseEntity.ok(favoriteService.toggle(francesinhaId));
     }
 }

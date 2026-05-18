@@ -1,5 +1,6 @@
 package com.app.tastefrancesinhasbackend.security;
 
+import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,11 +16,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // Spring Security llama a este método automáticamente durante la autenticación
-    // para cargar el usuario de BD a partir del username (en nuestro caso, el email)
+    // Spring Security llama a este método durante el login (AuthenticationManager.authenticate).
+    // Carga la entidad User de BD y la adapta a CustomUserDetails (la implementacion de UserDetails)
+    // De este modo la entidad User no se expone.
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
+        return CustomUserDetails.from(user);
     }
 }

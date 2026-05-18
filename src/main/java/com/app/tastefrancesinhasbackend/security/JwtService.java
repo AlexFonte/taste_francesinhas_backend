@@ -4,12 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -31,19 +31,22 @@ public class JwtService {
     }
 
     // Genera un access token (1 hora)
-    public String generateAccessToken(UserDetails userDetails) {
-        return buildToken(userDetails, expiration, Map.of());
+    public String generateAccessToken(CustomUserDetails customUserDetails) {
+        return buildToken(customUserDetails, expiration, Map.of());
     }
 
     // Genera un refresh token (7 días) con claim extra para distinguirlo
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(userDetails, refreshExpiration, Map.of("type", "refresh"));
+    public String generateRefreshToken(CustomUserDetails customUserDetails) {
+        return buildToken(customUserDetails, refreshExpiration, Map.of("type", "refresh"));
     }
 
-    private String buildToken(UserDetails userDetails, long ttl, Map<String, Object> extraClaims) {
+    private String buildToken(CustomUserDetails customUserDetails, long ttl, Map<String, Object> extraClaims) {
+        Map<String, Object> claims = new HashMap<>(extraClaims);
+        claims.put("uid", customUserDetails.id());
+        claims.put("role", customUserDetails.role().name());
         return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())   // el email del usuario
+                .claims(claims)
+                .subject(customUserDetails.email())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + ttl))
                 .signWith(signingKey)
@@ -52,25 +55,30 @@ public class JwtService {
 
     // Valida que el token es un access token, pertenece al usuario y no ha expirado
     // Rechaza explícitamente los refresh tokens para evitar que se usen como access tokens
-    public boolean isValid(String token, UserDetails userDetails) {
+    public boolean isValid(String token, CustomUserDetails customUserDetails) {
         Claims claims = extractAllClaims(token);
         String email = claims.getSubject();
         boolean isRefresh = "refresh".equals(claims.get("type", String.class));
         boolean isExpired = claims.getExpiration().before(new Date());
-        return email.equals(userDetails.getUsername()) && !isExpired && !isRefresh;
+        return email.equals(customUserDetails.email()) && !isExpired && !isRefresh;
     }
 
     // Valida que el token es un refresh token válido y pertenece al usuario
-    public boolean isValidRefreshToken(String token, UserDetails userDetails) {
+    public boolean isValidRefreshToken(String token, CustomUserDetails customUserDetails) {
         Claims claims = extractAllClaims(token);
         String email = claims.getSubject();
         boolean isRefresh = "refresh".equals(claims.get("type", String.class));
         boolean isExpired = claims.getExpiration().before(new Date());
-        return email.equals(userDetails.getUsername()) && !isExpired && isRefresh;
+        return email.equals(customUserDetails.email()) && !isExpired && isRefresh;
     }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    // Devuelve los claims completos del token validando firma y expiry. Usado por el filter
+    public Claims parseAndValidate(String token) {
+        return extractAllClaims(token);
     }
 
     // Parsea el token una sola vez y devuelve todos los claims - usado en isValid e isValidRefreshToken
