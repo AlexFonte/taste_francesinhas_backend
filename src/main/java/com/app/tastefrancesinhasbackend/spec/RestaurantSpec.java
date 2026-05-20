@@ -9,7 +9,8 @@ import java.util.List;
 
 public class RestaurantSpec {
 
-    private RestaurantSpec() {}
+    private RestaurantSpec() {
+    }
 
     public static Specification<Restaurant> withFilters(String name, String city) {
         return (root, query, cb) -> {

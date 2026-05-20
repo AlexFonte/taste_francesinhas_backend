@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public class AuthDTO{
+public class AuthDTO {
 
     public final static String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
     public final static String PASSWORD_ERROR_MSG = "La contraseña debe tener al menos 8 caracteres, una mayúscula y un número";
@@ -16,12 +16,14 @@ public class AuthDTO{
                     regexp = PASSWORD_PATTERN,
                     message = PASSWORD_ERROR_MSG
             ) String password
-    ) {}
+    ) {
+    }
 
     public record LoginRequest(
             @NotBlank @Email String email,
             @NotBlank String password
-    ) {}
+    ) {
+    }
 
     public record AuthResponse(
             String accessToken,
@@ -30,11 +32,13 @@ public class AuthDTO{
             String email,
             String role,
             Long userId
-    ) {}
+    ) {
+    }
 
     public record RefreshRequest(
             @NotBlank String refreshToken
-    ) {}
+    ) {
+    }
 
     public record ChangePasswordRequest(
             @NotBlank String currentPassword,
@@ -42,5 +46,6 @@ public class AuthDTO{
                     regexp = PASSWORD_PATTERN,
                     message = PASSWORD_ERROR_MSG
             ) String newPassword
-    ) {}
+    ) {
+    }
 }

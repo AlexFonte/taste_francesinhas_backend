@@ -36,7 +36,7 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public UserStatsResponse getStats() {
         Long userId = currentUser.id();
-        long reviewsCount   = reviewRepository.countByUserId(userId);
+        long reviewsCount = reviewRepository.countByUserId(userId);
         long proposalsCount = francesinhaRepository.countByProposedById(userId);
         return new UserStatsResponse(reviewsCount, proposalsCount);
     }

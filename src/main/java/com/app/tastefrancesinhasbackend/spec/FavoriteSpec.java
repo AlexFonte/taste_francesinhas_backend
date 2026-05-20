@@ -12,7 +12,8 @@ import java.util.List;
 
 public class FavoriteSpec {
 
-    private FavoriteSpec() {}
+    private FavoriteSpec() {
+    }
 
     public static Specification<Favorite> withFilters(Long userId, String name,
                                                       FrancesinhaType type, String city) {

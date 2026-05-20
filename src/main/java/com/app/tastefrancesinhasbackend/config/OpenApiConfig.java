@@ -9,18 +9,19 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-    info = @Info(
-        title = "Taste Francesinhas API",
-        version = "1.0",
-        description = "API REST para la plataforma de valoración de francesinhas portuguesas",
-        contact = @Contact(name = "Alex Ramos da Fonte Fonte", email = "aramosda@uoc.edu")
-    )
+        info = @Info(
+                title = "Taste Francesinhas API",
+                version = "1.0",
+                description = "API REST para la plataforma de valoración de francesinhas portuguesas",
+                contact = @Contact(name = "Alex Ramos da Fonte Fonte", email = "aramosda@uoc.edu")
+        )
 )
 @SecurityScheme(
-    name = "bearerAuth",
-    type = SecuritySchemeType.HTTP,
-    scheme = "bearer",
-    bearerFormat = "JWT",
-    description = "El access token se obtiene en /auth/login (sin el prefijo 'Bearer')"
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "El access token se obtiene en /auth/login (sin el prefijo 'Bearer')"
 )
-public class OpenApiConfig {}
+public class OpenApiConfig {
+}

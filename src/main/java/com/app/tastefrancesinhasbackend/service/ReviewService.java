@@ -32,9 +32,9 @@ public class ReviewService {
     private static final Set<String> ALLOWED_PHOTO_MIME = Set.of("image/jpeg", "image/jpg", "image/png", "image/webp");
     private static final Set<String> ALLOWED_PHOTO_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp");
     private static final Map<String, String> EXTENSION_TO_MIME = Map.of(
-            "jpg",  "image/jpeg",
+            "jpg", "image/jpeg",
             "jpeg", "image/jpeg",
-            "png",  "image/png",
+            "png", "image/png",
             "webp", "image/webp"
     );
 

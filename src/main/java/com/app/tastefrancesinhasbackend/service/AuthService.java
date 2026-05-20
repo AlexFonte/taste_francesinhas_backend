@@ -1,18 +1,14 @@
 package com.app.tastefrancesinhasbackend.service;
 
-import com.app.tastefrancesinhasbackend.dto.AuthDTO.AuthResponse;
-import com.app.tastefrancesinhasbackend.dto.AuthDTO.ChangePasswordRequest;
-import com.app.tastefrancesinhasbackend.dto.AuthDTO.LoginRequest;
-import com.app.tastefrancesinhasbackend.dto.AuthDTO.RefreshRequest;
-import com.app.tastefrancesinhasbackend.dto.AuthDTO.RegisterRequest;
+import com.app.tastefrancesinhasbackend.dto.AuthDTO.*;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.Role;
 import com.app.tastefrancesinhasbackend.exception.ConflictException;
 import com.app.tastefrancesinhasbackend.exception.UnauthorizedException;
 import com.app.tastefrancesinhasbackend.repository.UserRepository;
 import com.app.tastefrancesinhasbackend.security.CurrentUserContext;
-import com.app.tastefrancesinhasbackend.security.JwtService;
 import com.app.tastefrancesinhasbackend.security.CustomUserDetails;
+import com.app.tastefrancesinhasbackend.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

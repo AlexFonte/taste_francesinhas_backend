@@ -8,25 +8,6 @@ import java.time.LocalDateTime;
 
 public class RestaurantDTO {
 
-    public record RestaurantRequest(
-            @NotBlank String name,
-            String address,
-            @NotBlank String city,
-            String phone
-    ) {}
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record RestaurantResponse(
-            Long id,
-            String name,
-            String address,
-            String city,
-            String phone,
-            String proposedByEmail,
-            Long totalFrancesinhas,
-            LocalDateTime createdAt
-    ) {}
-
     // Mapea la entidad Restaurant al record de respuesta
     public static RestaurantResponse responsePublic(Restaurant r) {
         return new RestaurantResponse(
@@ -52,5 +33,26 @@ public class RestaurantDTO {
                 r.getTotalFrancesinhas(),
                 r.getCreatedAt()
         );
+    }
+
+    public record RestaurantRequest(
+            @NotBlank String name,
+            String address,
+            @NotBlank String city,
+            String phone
+    ) {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record RestaurantResponse(
+            Long id,
+            String name,
+            String address,
+            String city,
+            String phone,
+            String proposedByEmail,
+            Long totalFrancesinhas,
+            LocalDateTime createdAt
+    ) {
     }
 }

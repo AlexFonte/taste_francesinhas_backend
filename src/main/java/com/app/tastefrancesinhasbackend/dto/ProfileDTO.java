@@ -11,32 +11,6 @@ import java.time.LocalDateTime;
 
 public class ProfileDTO {
 
-    // Contadores agregados que pinta la pantalla de perfil del usuario.
-    public record UserStatsResponse(
-            long reviewsCount,
-            long proposalsCount
-    ) {}
-
-    // Review del usuario con datos minimos de la francesinha valorada,
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record MyReviewResponse(
-            Long id,
-            Short scoreFlavor,
-            Short scoreSauce,
-            Short scoreBread,
-            Short scorePresentation,
-            BigDecimal avgScore,
-            String comment,
-            String photoUrl,
-            LocalDateTime createdAt,
-            Long francesinhaId,
-            String francesinhaName,
-            FrancesinhaType francesinhaType,
-            FrancesinhaStatus francesinhaStatus,
-            String restaurantName,
-            String restaurantCity
-    ) {}
-
     public static MyReviewResponse responseMyReview(Review r) {
         return new MyReviewResponse(
                 r.getId(),
@@ -56,42 +30,6 @@ public class ProfileDTO {
                 r.getFrancesinha().getRestaurant().getCity()
         );
     }
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record MyProposalResponse(
-            Long id,
-            String name,
-            String description,
-            BigDecimal price,
-            boolean hasEgg,
-            boolean hasFries,
-            boolean isSpicy,
-            FrancesinhaType type,
-            FrancesinhaStatus status,
-            Long totalReviews,
-            BigDecimal avgScore,
-            BigDecimal avgFlavor,
-            BigDecimal avgSauce,
-            BigDecimal avgBread,
-            BigDecimal avgPresentation,
-            LocalDateTime createdAt,
-            RestaurantDTO.RestaurantResponse restaurant,
-            ProposalReview userReview
-    ) {}
-
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record ProposalReview(
-            Long id,
-            Short scoreFlavor,
-            Short scoreSauce,
-            Short scoreBread,
-            Short scorePresentation,
-            BigDecimal avgScore,
-            String comment,
-            String photoUrl,
-            LocalDateTime createdAt
-    ) {}
 
     public static MyProposalResponse responseMyProposal(Francesinha f, Review userReview) {
         return new MyProposalResponse(
@@ -128,5 +66,70 @@ public class ProfileDTO {
                 r.getPhotoUrl(),
                 r.getCreatedAt()
         );
+    }
+
+    // Contadores agregados que pinta la pantalla de perfil del usuario.
+    public record UserStatsResponse(
+            long reviewsCount,
+            long proposalsCount
+    ) {
+    }
+
+    // Review del usuario con datos minimos de la francesinha valorada,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record MyReviewResponse(
+            Long id,
+            Short scoreFlavor,
+            Short scoreSauce,
+            Short scoreBread,
+            Short scorePresentation,
+            BigDecimal avgScore,
+            String comment,
+            String photoUrl,
+            LocalDateTime createdAt,
+            Long francesinhaId,
+            String francesinhaName,
+            FrancesinhaType francesinhaType,
+            FrancesinhaStatus francesinhaStatus,
+            String restaurantName,
+            String restaurantCity
+    ) {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record MyProposalResponse(
+            Long id,
+            String name,
+            String description,
+            BigDecimal price,
+            boolean hasEgg,
+            boolean hasFries,
+            boolean isSpicy,
+            FrancesinhaType type,
+            FrancesinhaStatus status,
+            Long totalReviews,
+            BigDecimal avgScore,
+            BigDecimal avgFlavor,
+            BigDecimal avgSauce,
+            BigDecimal avgBread,
+            BigDecimal avgPresentation,
+            LocalDateTime createdAt,
+            RestaurantDTO.RestaurantResponse restaurant,
+            ProposalReview userReview
+    ) {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record ProposalReview(
+            Long id,
+            Short scoreFlavor,
+            Short scoreSauce,
+            Short scoreBread,
+            Short scorePresentation,
+            BigDecimal avgScore,
+            String comment,
+            String photoUrl,
+            LocalDateTime createdAt
+    ) {
     }
 }

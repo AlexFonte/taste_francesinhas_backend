@@ -13,7 +13,8 @@ import java.util.List;
 
 public class MyReviewSpec {
 
-    private MyReviewSpec() {}
+    private MyReviewSpec() {
+    }
 
     // Filtros para "mis reviews" del perfil. Buscar por el usuario logeado: user.id = X y francesinha.status = ACCEPTED
     // (en /profile/reviews no enseñamos reviews de propuestas pendientes/rechazadas).

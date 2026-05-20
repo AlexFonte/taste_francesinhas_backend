@@ -14,5 +14,6 @@ public record SupabaseProperties(
             String region,
             String accessKey,
             String secretKey
-    ) {}
+    ) {
+    }
 }

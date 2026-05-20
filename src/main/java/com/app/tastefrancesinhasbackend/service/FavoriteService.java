@@ -46,10 +46,10 @@ public class FavoriteService {
         Map<Long, String> covers = francesinhaIds.isEmpty()
                 ? Map.of()
                 : reviewRepository.findCoverPhotoUrlsByFrancesinhaIds(francesinhaIds).stream()
-                    .collect(Collectors.toMap(
-                            row -> ((Number) row[0]).longValue(),
-                            row -> (String) row[1]
-                    ));
+                  .collect(Collectors.toMap(
+                          row -> ((Number) row[0]).longValue(),
+                          row -> (String) row[1]
+                  ));
 
         return page.map(fav -> FavoriteDTO.response(fav, covers.get(fav.getFrancesinha().getId())));
     }

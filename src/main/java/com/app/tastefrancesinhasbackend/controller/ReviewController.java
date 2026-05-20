@@ -3,16 +3,11 @@ package com.app.tastefrancesinhasbackend.controller;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewRequest;
 import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
 import com.app.tastefrancesinhasbackend.dto.ReviewsPageResponse;
-import com.app.tastefrancesinhasbackend.exception.BadRequestException;
 import com.app.tastefrancesinhasbackend.service.ReviewService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/francesinhas/{francesinhaId}/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +32,7 @@ public class ReviewController {
     @ApiResponse(responseCode = "404", description = "Francesinha no encontrada o no aprobada")
     @GetMapping
     public ResponseEntity<ReviewsPageResponse<ReviewResponse>> findAll(@PathVariable Long francesinhaId,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(ReviewsPageResponse.of(reviewService.findByFrancesinha(francesinhaId, pageable)));
     }
 

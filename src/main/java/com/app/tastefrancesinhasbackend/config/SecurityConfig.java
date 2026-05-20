@@ -33,11 +33,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOrigins;
-
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsServiceImpl userDetailsService;
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
 
     // El AuthenticationEntryPoint lo declaramos como bean mas abajo y lo recibimos aqui
     // por parametro (no por constructor) para no crear una dependencia ciclica con la propia SecurityConfig.

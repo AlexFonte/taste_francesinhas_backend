@@ -55,9 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Evita re-autenticar si ya hay sesion activa en esta request.
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                Long   uid   = claims.get("uid", Long.class);
+                Long uid = claims.get("uid", Long.class);
                 String email = claims.getSubject();
-                Role   role  = Role.valueOf(claims.get("role", String.class));
+                Role role = Role.valueOf(claims.get("role", String.class));
 
                 // Construimos el AutneitcaetedIUser sin tocar BD. Los services que necesiten la
                 AuthenticatedUser authenticatedUser = new AuthenticatedUser(uid, email, role);

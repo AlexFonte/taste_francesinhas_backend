@@ -13,7 +13,8 @@ import java.util.List;
 
 public class FrancesinhaSpec {
 
-    private FrancesinhaSpec() {}
+    private FrancesinhaSpec() {
+    }
 
     public static Specification<Francesinha> withFilters(FrancesinhaStatus status, String name,
                                                          FrancesinhaType type, String city,

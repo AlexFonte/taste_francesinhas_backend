@@ -15,65 +15,12 @@ import java.util.List;
 
 public class FrancesinhaDTO {
 
-    public record FrancesinhaRequest(
-            @NotNull Long restaurantId,
-            @NotBlank String name,
-            String description,
-            @NotNull @DecimalMin("0.01") BigDecimal price,
-            boolean hasEgg,
-            boolean hasFries,
-            boolean isSpicy,
-            @NotNull FrancesinhaType type
-    ) {}
-
-    public record FrancesinhaStatusRequest(
-            @NotNull FrancesinhaStatus status
-    ) {}
-
-    // Contadores agregados que pinta el dashboard de admin (4 cards arriba)
-    public record StatsResponse(
-            long pending,
-            long accepted,
-            long rejected,
-            long total
-    ) {}
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record FrancesinhaResponse(
-            Long id,
-            String name,
-            String description,
-            BigDecimal price,
-            boolean hasEgg,
-            boolean hasFries,
-            boolean isSpicy,
-            FrancesinhaType type,
-            FrancesinhaStatus status,
-            Long totalReviews,
-            BigDecimal avgScore,
-            BigDecimal avgFlavor,
-            BigDecimal avgSauce,
-            BigDecimal avgBread,
-            BigDecimal avgPresentation,
-            String proposedByEmail,
-            String coverPhotoUrl,
-            List<String> photoUrls,
-            LocalDateTime createdAt,
-            RestaurantDTO.RestaurantResponse restaurant
-    ) {}
-
     public static PendingFrancesinhaWithReviewResponse pendingWithReview(Francesinha f, String coverPhotoUrl,
                                                                          List<String> photoUrls, Review review) {
         return new PendingFrancesinhaWithReviewResponse(
                 responsePrivate(f, coverPhotoUrl, photoUrls),
                 review != null ? ReviewDTO.responsePublic(review) : null
         );
-    }
-
-    public record PendingFrancesinhaWithReviewResponse(
-            FrancesinhaResponse francesinha,
-            ReviewDTO.ReviewResponse review
-    ) {
     }
 
     public static FrancesinhaResponse responsePublic(Francesinha f, String coverPhotoUrl, List<String> photoUrls) {
@@ -124,5 +71,62 @@ public class FrancesinhaDTO {
                 f.getCreatedAt(),
                 RestaurantDTO.responsePrivate(f.getRestaurant())
         );
+    }
+
+    public record FrancesinhaRequest(
+            @NotNull Long restaurantId,
+            @NotBlank String name,
+            String description,
+            @NotNull @DecimalMin("0.01") BigDecimal price,
+            boolean hasEgg,
+            boolean hasFries,
+            boolean isSpicy,
+            @NotNull FrancesinhaType type
+    ) {
+    }
+
+    public record FrancesinhaStatusRequest(
+            @NotNull FrancesinhaStatus status
+    ) {
+    }
+
+    // Contadores agregados que pinta el dashboard de admin (4 cards arriba)
+    public record StatsResponse(
+            long pending,
+            long accepted,
+            long rejected,
+            long total
+    ) {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record FrancesinhaResponse(
+            Long id,
+            String name,
+            String description,
+            BigDecimal price,
+            boolean hasEgg,
+            boolean hasFries,
+            boolean isSpicy,
+            FrancesinhaType type,
+            FrancesinhaStatus status,
+            Long totalReviews,
+            BigDecimal avgScore,
+            BigDecimal avgFlavor,
+            BigDecimal avgSauce,
+            BigDecimal avgBread,
+            BigDecimal avgPresentation,
+            String proposedByEmail,
+            String coverPhotoUrl,
+            List<String> photoUrls,
+            LocalDateTime createdAt,
+            RestaurantDTO.RestaurantResponse restaurant
+    ) {
+    }
+
+    public record PendingFrancesinhaWithReviewResponse(
+            FrancesinhaResponse francesinha,
+            ReviewDTO.ReviewResponse review
+    ) {
     }
 }
