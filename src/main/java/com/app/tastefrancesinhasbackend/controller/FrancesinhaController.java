@@ -1,12 +1,7 @@
 package com.app.tastefrancesinhasbackend.controller;
 
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaRequest;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaResponse;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaStatusRequest;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
+import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.*;
 import com.app.tastefrancesinhasbackend.dto.FrancesinhasPageResponse;
-import com.app.tastefrancesinhasbackend.dto.ReviewDTO.ReviewResponse;
-import com.app.tastefrancesinhasbackend.dto.ReviewsPageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FrancesinhaService;
@@ -88,14 +83,14 @@ public class FrancesinhaController {
         return ResponseEntity.ok(FrancesinhasPageResponse.of(francesinhaService.findAllForAdmin(status, pageable)));
     }
 
-    @Operation(summary = "Detalle de francesinha pendiente", description = "Solo ADMIN. Muestra detalle de francesinha con estado pendiente.")
+    @Operation(summary = "Detalle de francesinha pendiente", description = "Solo ADMIN. Devuelve el detalle de la francesinha junto a la review que dejó el proponente al crearla, en un único DTO.")
     @ApiResponse(responseCode = "200", description = "Francesinha encontrada")
     @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
     @ApiResponse(responseCode = "404", description = "No encontrada")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/pending/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<FrancesinhaResponse> findByIdForAdmin(@PathVariable Long id) {
+    public ResponseEntity<PendingFrancesinhaWithReviewResponse> findByIdForAdmin(@PathVariable Long id) {
         return ResponseEntity.ok(francesinhaService.findByIdForAdmin(id));
     }
 
@@ -109,18 +104,6 @@ public class FrancesinhaController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<FrancesinhaResponse> propose(@Valid @RequestBody FrancesinhaRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(francesinhaService.propose(request));
-    }
-
-    @Operation(summary = "Listar reviews de una francesinha pendiente", description = "Solo ADMIN. Devuelve las reviews sin filtrar por estado de la francesinha (la review que dejó el proponente cuando creó la propuesta).")
-    @ApiResponse(responseCode = "200", description = "Listado paginado")
-    @ApiResponse(responseCode = "403", description = "Sin permiso de administrador")
-    @ApiResponse(responseCode = "404", description = "Francesinha no encontrada")
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/pending/{id}/reviews")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ReviewsPageResponse<ReviewResponse>> findReviewsForAdmin(@PathVariable Long id,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ReviewsPageResponse.of(reviewService.findByFrancesinhaForAdmin(id, pageable)));
     }
 
     @Operation(summary = "Aprobar o rechazar francesinha", description = "Solo ADMIN. Cambia el estado a ACCEPTED o REJECTED.")

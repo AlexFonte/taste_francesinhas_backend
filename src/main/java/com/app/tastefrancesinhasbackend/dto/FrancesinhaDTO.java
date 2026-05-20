@@ -1,6 +1,7 @@
 package com.app.tastefrancesinhasbackend.dto;
 
 import com.app.tastefrancesinhasbackend.entity.Francesinha;
+import com.app.tastefrancesinhasbackend.entity.Review;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -60,6 +61,20 @@ public class FrancesinhaDTO {
             LocalDateTime createdAt,
             RestaurantDTO.RestaurantResponse restaurant
     ) {}
+
+    public static PendingFrancesinhaWithReviewResponse pendingWithReview(Francesinha f, String coverPhotoUrl,
+                                                                         List<String> photoUrls, Review review) {
+        return new PendingFrancesinhaWithReviewResponse(
+                responsePrivate(f, coverPhotoUrl, photoUrls),
+                review != null ? ReviewDTO.responsePublic(review) : null
+        );
+    }
+
+    public record PendingFrancesinhaWithReviewResponse(
+            FrancesinhaResponse francesinha,
+            ReviewDTO.ReviewResponse review
+    ) {
+    }
 
     public static FrancesinhaResponse responsePublic(Francesinha f, String coverPhotoUrl, List<String> photoUrls) {
         return new FrancesinhaResponse(

@@ -1,12 +1,10 @@
 package com.app.tastefrancesinhasbackend.service;
 
 import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaRequest;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaResponse;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.FrancesinhaStatusRequest;
-import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.StatsResponse;
+import com.app.tastefrancesinhasbackend.dto.FrancesinhaDTO.*;
 import com.app.tastefrancesinhasbackend.entity.Francesinha;
 import com.app.tastefrancesinhasbackend.entity.Restaurant;
+import com.app.tastefrancesinhasbackend.entity.Review;
 import com.app.tastefrancesinhasbackend.entity.User;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
@@ -64,7 +62,7 @@ public class FrancesinhaService {
     // El total se calcula sumando para evitar una query extra al COUNT(*) de la tabla entera.
     @Transactional(readOnly = true)
     public StatsResponse getStats() {
-        long pending  = francesinhaRepository.countByStatus(FrancesinhaStatus.PENDING);
+        long pending = francesinhaRepository.countByStatus(FrancesinhaStatus.PENDING);
         long accepted = francesinhaRepository.countByStatus(FrancesinhaStatus.ACCEPTED);
         long rejected = francesinhaRepository.countByStatus(FrancesinhaStatus.REJECTED);
         return new StatsResponse(pending, accepted, rejected, pending + accepted + rejected);
@@ -90,13 +88,15 @@ public class FrancesinhaService {
     }
 
     // Igual que findById pero sin filtrar por estado, para que el admin pueda ver cualquier francesinha.
+    // Devuelve la francesinha junto a la review de la propuesat: se envia todo la info en ela misma dto
     @Transactional(readOnly = true)
-    public FrancesinhaResponse findByIdForAdmin(Long id) {
+    public PendingFrancesinhaWithReviewResponse findByIdForAdmin(Long id) {
         Francesinha francesinha = francesinhaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
         String coverPhotoUrl = fetchCoverPhotos(List.of(id)).get(id);
         List<String> photoUrls = reviewRepository.findPhotoUrlsByFrancesinhaId(id);
-        return FrancesinhaDTO.responsePrivate(francesinha, coverPhotoUrl, photoUrls);
+        Review proposalReview = reviewRepository.findFirstByFrancesinhaIdOrderByCreatedAtAsc(id).orElse(null);
+        return FrancesinhaDTO.pendingWithReview(francesinha, coverPhotoUrl, photoUrls, proposalReview);
     }
 
     // El admin aprueba o rechaza una francesinha pendiente. No se puede volver a poner en PENDING.

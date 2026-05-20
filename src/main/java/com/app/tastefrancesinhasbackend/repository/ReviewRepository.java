@@ -26,6 +26,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
 
     Optional<Review> findByFrancesinhaIdAndUserId(Long francesinhaId, Long userId);
 
+    // Obtener review de la propuesta de una francesinha pendiente:
+    // la mas antigua, que es la que se crea junto a la propuesta
+    @EntityGraph(attributePaths = {"user"})
+    Optional<Review> findFirstByFrancesinhaIdOrderByCreatedAtAsc(Long francesinhaId);
+
     long countByUserId(Long userId);
 
     // Reviews del usuario con francesinha + restaurante cargados en el mismo JOIN.
