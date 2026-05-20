@@ -5,7 +5,6 @@ import com.app.tastefrancesinhasbackend.dto.FrancesinhasPageResponse;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaStatus;
 import com.app.tastefrancesinhasbackend.entity.enums.FrancesinhaType;
 import com.app.tastefrancesinhasbackend.service.FrancesinhaService;
-import com.app.tastefrancesinhasbackend.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class FrancesinhaController {
 
     private final FrancesinhaService francesinhaService;
-    private final ReviewService reviewService;
 
     @Operation(summary = "Listar francesinhas aceptadas", description = "Filtros opcionales: name, city, type, restaurantId.")
     @ApiResponse(responseCode = "200", description = "Listado paginado")

@@ -95,7 +95,10 @@ public class FrancesinhaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Francesinha no encontrada: " + id));
         String coverPhotoUrl = fetchCoverPhotos(List.of(id)).get(id);
         List<String> photoUrls = reviewRepository.findPhotoUrlsByFrancesinhaId(id);
-        Review proposalReview = reviewRepository.findFirstByFrancesinhaIdOrderByCreatedAtAsc(id).orElse(null);
+        // Una propuesta sin review es un estado invalido (propuesta incompleta): no se puede
+        // moderar, asi que cortamos aqui en vez de dejar al admin abrir un detalle a medias.
+        Review proposalReview = reviewRepository.findFirstByFrancesinhaIdOrderByCreatedAtAsc(id)
+                .orElseThrow(() -> new ResourceNotFoundException("La propuesta no tiene review asociada: " + id));
         return FrancesinhaDTO.pendingWithReview(francesinha, coverPhotoUrl, photoUrls, proposalReview);
     }
 
