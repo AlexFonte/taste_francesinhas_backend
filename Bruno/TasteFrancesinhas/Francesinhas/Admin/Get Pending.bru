@@ -19,8 +19,15 @@ auth:bearer {
 }
 
 docs {
-  Solo ADMIN. Devuelve el detalle de una francesinha sin filtrar por estado
-  (pensado para ver propuestas en estado PENDING).
+  Solo ADMIN. Devuelve el detalle de la francesinha junto con la review que dejo el
+  proponente al crearla, en un unico DTO PendingFrancesinhaWithReviewResponse
+  (francesinha + userReview). Sirve para cualquier estado (PENDING, ACCEPTED, REJECTED).
+
+  Respuestas:
+  - 200 OK: francesinha + review del proponente.
+  - 403 Forbidden: sin permiso de administrador.
+  - 404 Not Found: la francesinha no existe o la propuesta no tiene review
+    (estado invalido, no se puede moderar a medias).
 }
 
 settings {

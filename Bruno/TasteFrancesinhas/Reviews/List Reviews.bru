@@ -18,7 +18,8 @@ params:query {
 
 docs {
   Lista paginada de reviews. Solo funciona con francesinhas en estado ACCEPTED.
-  Para reviews de PENDING usar el endpoint admin /francesinhas/pending/{id}/reviews.
+  La review del proponente de una francesinha PENDING viaja embebida en el DTO de
+  GET /francesinhas/pending/{id} (campo userReview), no en este endpoint.
 }
 
 settings {
