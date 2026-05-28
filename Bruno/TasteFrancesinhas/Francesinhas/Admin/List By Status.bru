@@ -1,0 +1,40 @@
+meta {
+  name: List By Status
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{uri}}/francesinhas/admin?status=ACCEPTED&page=0&size=10&sort=createdAt,desc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  status: ACCEPTED
+  page: 0
+  size: 10
+  sort: createdAt,desc
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo ADMIN. Lista francesinhas filtradas por estado (ACCEPTED o REJECTED), paginadas.
+  El parametro status es OBLIGATORIO (devuelve 400 si falta).
+
+  Reutiliza FrancesinhaSpec.withFilters y devuelve responsePrivate (con datos extra de admin).
+  Lo usa la pantalla /admin/proposals para ver propuestas ya revisadas.
+
+  Respuestas:
+  - 200 OK: pagina con la lista.
+  - 400 Bad Request: status ausente o invalido (PENDING no esta permitido aqui).
+  - 403 Forbidden: sin permiso de administrador.
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

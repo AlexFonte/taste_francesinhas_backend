@@ -1,0 +1,44 @@
+meta {
+  name: My Reviews
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{uri}}/profile/reviews?page=0&size=10&sort=createdAt,desc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: createdAt,desc
+  ~name:
+  ~type:
+  ~city:
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo USER. Devuelve las reviews del usuario autenticado, paginadas.
+  Solo lista reviews de francesinhas en estado ACCEPTED.
+
+  Filtros opcionales (quitar la tilde ~ para activarlos):
+    - name: filtra por nombre de la francesinha (like)
+    - type: CLASICA | ESPECIAL | VEGANA | KEBAB | MARISCO
+    - city: filtra por ciudad del restaurante (like)
+
+  Respuestas:
+  - 200 OK: pagina con la lista de MyReviewResponse.
+  - 401 Unauthorized: sin token.
+  - 403 Forbidden: el rol ADMIN no tiene reviews propias.
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

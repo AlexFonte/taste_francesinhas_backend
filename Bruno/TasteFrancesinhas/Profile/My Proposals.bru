@@ -1,0 +1,43 @@
+meta {
+  name: My Proposals
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{uri}}/profile/proposals?page=0&size=10&sort=createdAt,desc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: createdAt,desc
+  ~status:
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  Solo USER. Devuelve las propuestas del usuario autenticado, paginadas.
+  Lista todas las propuestas independientemente del estado por defecto.
+
+  Filtro opcional (quitar la tilde ~ para activarlo):
+    - status: PENDING | ACCEPTED | REJECTED
+
+  Cada propuesta incluye opcionalmente la review que el usuario dejo al proponerla
+  (campo userReview), util para mostrar el detalle desde la pantalla "Mis propuestas".
+
+  Respuestas:
+  - 200 OK: pagina con la lista de MyProposalResponse.
+  - 401 Unauthorized: sin token.
+  - 403 Forbidden: el rol ADMIN no propone francesinhas.
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
