@@ -19,6 +19,12 @@ Permite descubrir, proponer y valorar **francesinhas** (sandwich típico de Opor
 | Lombok          | última   |
 | Maven Wrapper   | 3.9.x    |
 
+**Spring Boot 4.0.5** es el framework principal sobre el que se construye la API REST. Aporta servidor embebido,
+configuración por convención y los módulos utilizados en el proyecto: Spring Web para los endpoints, Spring Security
+para la autenticación y autorización por roles (con BCrypt para las contraseñas), Spring Data JPA con Hibernate para la
+persistencia, Spring Validation para los DTO, Spring Actuator para los endpoints de monitorización y Spring Boot Test
+con JUnit 5 y Mockito para las pruebas.
+
 ---
 
 ## Requisitos previos
@@ -146,11 +152,20 @@ src/main/java/com/app/tastefrancesinhasbackend/
 ## Endpoints principales
 
 ### Auth
-| Método | Ruta            | Auth | Descripción            |
-|--------|-----------------|------|------------------------|
-| POST   | `/auth/signup`  | -    | Registro               |
-| POST   | `/auth/login`   | -    | Login                  |
-| POST   | `/auth/refresh` | -    | Renueva par de tokens  |
+
+| Método | Ruta            | Auth | Descripción           |
+|--------|-----------------|------|-----------------------|
+| POST   | `/auth/signup`  | -    | Registro              |
+| POST   | `/auth/login`   | -    | Login                 |
+| POST   | `/auth/refresh` | -    | Renueva par de tokens |
+
+### Profile
+
+| Método | Ruta                 | Auth     | Descripción                                                                           |
+|--------|----------------------|----------|---------------------------------------------------------------------------------------|
+| GET    | `/profile/stats`     | logueado | `{ reviewsCount, proposalsCount }` del usuario                                        |
+| GET    | `/profile/reviews`   | USER     | Listado paginado de reviews del usuario (solo de francesinhas ACCEPTED)               |
+| GET    | `/profile/proposals` | USER     | Listado paginado de propuestas. Filtro opcional `?status=PENDING\|ACCEPTED\|REJECTED` |
 
 ### Restaurantes
 | Método | Ruta                | Auth         | Descripción                  |
@@ -160,25 +175,24 @@ src/main/java/com/app/tastefrancesinhasbackend/
 | POST   | `/restaurants`      | USER / ADMIN | Crea un restaurante (nace inactivo) |
 
 ### Francesinhas
-| Método | Ruta                                | Auth  | Descripción                     |
-|--------|-------------------------------------|-------|---------------------------------|
-| GET    | `/francesinhas`                     | -     | Listado aceptadas (paginado)    |
-| GET    | `/francesinhas/{id}`                | -     | Detalle                         |
-| GET    | `/francesinhas/stats`               | ADMIN | Contadores (pending/accepted/…) |
-| POST   | `/francesinhas/propose`             | USER  | Propuesta nueva (queda PENDING) |
-| GET    | `/francesinhas/pending`             | ADMIN | Listado pendientes              |
-| GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle sin filtro de estado    |
-| GET    | `/francesinhas/pending/{id}/reviews`| ADMIN | Reviews de una pendiente        |
-| PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Aprobar / rechazar              |
+
+| Método | Ruta                                | Auth  | Descripción                                                     |
+|--------|-------------------------------------|-------|-----------------------------------------------------------------|
+| GET    | `/francesinhas`                     | -     | Listado aceptadas (paginado)                                    |
+| GET    | `/francesinhas/{id}`                | -     | Detalle                                                         |
+| GET    | `/francesinhas/stats`               | ADMIN | Contadores (pending/accepted/…)                                 |
+| POST   | `/francesinhas/propose`             | USER  | Propuesta nueva (queda PENDING)                                 |
+| GET    | `/francesinhas/pending`             | ADMIN | Listado pendientes                                              |
+| GET    | `/francesinhas/pending/{id}`        | ADMIN | Detalle de la propuesta + review del proponente en un único DTO |
+| GET    | `/francesinhas/admin?status=`       | ADMIN | Listado por estado (ACCEPTED \| REJECTED)                       |
+| PATCH  | `/francesinhas/pending/{id}/status` | ADMIN | Aprobar / rechazar                                              |
 
 ### Reviews
-| Método | Ruta                                    | Auth         | Descripción           |
-|--------|-----------------------------------------|--------------|-----------------------|
-| GET    | `/francesinhas/{id}/reviews`            | -            | Listado paginado      |
-| POST   | `/francesinhas/{id}/reviews`            | USER / ADMIN | Crear (1 por usuario) |
-| DELETE | `/francesinhas/{id}/reviews/{reviewId}` | USER / ADMIN | Borrar la propia      |
 
-> El POST acepta un flag opcional `propuesta: true` - usado por el flujo "Proponer" para asociar la primera review a una francesinha aún estado PENDING.
+| Método | Ruta                         | Auth | Descripción                                                                                           |
+|--------|------------------------------|------|-------------------------------------------------------------------------------------------------------|
+| GET    | `/francesinhas/{id}/reviews` | -    | Listado paginado                                                                                      |
+| POST   | `/francesinhas/{id}/reviews` | USER | Crear (1 por usuario). `multipart/form-data` con parte `review` (JSON) + parte `file` opcional (foto) |
 
 ### Favoritos
 | Método | Ruta                          | Auth | Descripción                   |
@@ -268,6 +282,41 @@ Ambos se firman con `HS256` y la clave `JWT_SECRET`. El refresh lleva un claim e
 Esto reemplaza el comportamiento por defecto de Spring Security (que devolvería 403 a peticiones anónimas) y permite al frontend distinguir limpiamente:
 - **401** → sesión expirada → hacer logout y redirigir a login
 - **403** → autenticado pero sin permisos → mostrar mensaje, no logout
+
+---
+
+## Fotos en reviews (Supabase Storage)
+
+Cada review puede llevar **una foto opcional** que viaja en la misma petición de creación (multipart). El binario se
+sube a Supabase Storage —compatible con la API S3— y la URL pública resultante se persiste en `review.photo_url`.
+
+| Pieza             | Detalle                                                                                           |
+|-------------------|---------------------------------------------------------------------------------------------------|
+| Bucket            | `francesinhas-photos` (público en lectura)                                                        |
+| Cliente           | `software.amazon.awssdk:s3` con `forcePathStyle(true)` (Supabase usa path-style)                  |
+| Nombre del objeto | `{francesinhaId}_{UUID}.{ext}`                                                                    |
+| MIME permitidos   | `image/jpeg`, `image/jpg`, `image/png`, `image/webp`                                              |
+| Tamaño máximo     | 5 MB (validado en frontend y backend)                                                             |
+| Atomicidad        | `ReviewService.create` es `@Transactional`: si falla el INSERT o el `updateScore`, rollback de BD |
+| URL pública       | `https://<project>.supabase.co/storage/v1/object/public/{bucket}/{filename}`                      |
+
+### Variables de entorno
+
+| Variable                 | Descripción                                                               |
+|--------------------------|---------------------------------------------------------------------------|
+| `SUPABASE_URL`           | URL del proyecto Supabase (base para construir la URL pública del objeto) |
+| `SUPABASE_S3_ENDPOINT`   | Endpoint S3 de Supabase Storage (para el `S3Client`)                      |
+| `SUPABASE_S3_REGION`     | Región declarada en el dashboard de Supabase                              |
+| `SUPABASE_S3_ACCESS_KEY` | Access key generada en Supabase                                           |
+| `SUPABASE_S3_SECRET_KEY` | Secret key emparejada                                                     |
+| `SUPABASE_S3_BUCKET`     | Nombre del bucket (`francesinhas-photos`)                                 |
+
+### Carga eficiente en la app
+
+- **Listado:** una sola foto "cover" por francesinha vía `ReviewRepository.findCoverPhotoUrlsByFrancesinhaIds(ids)` —
+  query nativa con `ROW_NUMBER() OVER (PARTITION BY francesinha_id ORDER BY created_at DESC)` que evita N+1.
+- **Detalle:** todas las URLs vía `findPhotoUrlsByFrancesinhaId(id)` que viaja en el campo `photoUrls` del DTO (
+  `@JsonInclude(NON_NULL)` para que no aparezca en los listados).
 
 ---
 
