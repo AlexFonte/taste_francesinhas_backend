@@ -22,8 +22,7 @@ Permite descubrir, proponer y valorar **francesinhas** (sandwich típico de Opor
 **Spring Boot 4.0.5** es el framework principal sobre el que se construye la API REST. Aporta servidor embebido,
 configuración por convención y los módulos utilizados en el proyecto: Spring Web para los endpoints, Spring Security
 para la autenticación y autorización por roles (con BCrypt para las contraseñas), Spring Data JPA con Hibernate para la
-persistencia, Spring Validation para los DTO, Spring Actuator para los endpoints de monitorización y Spring Boot Test
-con JUnit 5 y Mockito para las pruebas.
+persistencia, Spring Validation para los DTO, Spring Actuator para los endpoints de monitorización.
 
 ---
 
