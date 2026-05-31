@@ -5,9 +5,9 @@ meta {
 }
 
 patch {
-  url: {{uri}}/francesinhas/pending/1/status
+  url: {{uri}}/francesinhas/pending/4/status
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 headers {
@@ -18,23 +18,22 @@ auth:bearer {
   token: {{authToken}}
 }
 
-
 body:json {
   {
     "status": "ACCEPTED"
   }
 }
 
-docs {
-  Solo ADMIN. Cambia el estado de una francesinha PENDING a ACCEPTED o REJECTED.
-  PENDING en el body devuelve 400. La francesinha no puede salir de ACCEPTED/REJECTED a otro estado.
-
-  Efecto colateral: si el estado pasa a ACCEPTED y el restaurante asociado todavia
-  esta inactivo (caso del flujo "proponer con restaurante nuevo"), el restaurante
-  se activa automaticamente y empieza a aparecer en GET /restaurants.
-}
-
 settings {
   encodeUrl: false
   timeout: 0
+}
+
+docs {
+  Solo ADMIN. Cambia el estado de una francesinha PENDING a ACCEPTED o REJECTED.
+  PENDING en el body devuelve 400. La francesinha no puede salir de ACCEPTED/REJECTED a otro estado.
+  
+  Efecto colateral: si el estado pasa a ACCEPTED y el restaurante asociado todavia
+  esta inactivo (caso del flujo "proponer con restaurante nuevo"), el restaurante
+  se activa automaticamente y empieza a aparecer en GET /restaurants.
 }

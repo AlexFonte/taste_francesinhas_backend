@@ -7,11 +7,7 @@ meta {
 get {
   url: {{uri}}/favorites/36
   body: none
-  auth: inherit
-}
-
-headers {
-  ~Authorization: Bearer {{authToken}}
+  auth: bearer
 }
 
 auth:bearer {

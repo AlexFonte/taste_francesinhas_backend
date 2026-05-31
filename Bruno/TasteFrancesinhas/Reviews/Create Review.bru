@@ -7,11 +7,7 @@ meta {
 post {
   url: {{uri}}/francesinhas/53/reviews
   body: multipartForm
-  auth: inherit
-}
-
-headers {
-  ~ Authorization: Bearer {{authToken}}
+  auth: bearer
 }
 
 auth:bearer {
@@ -20,7 +16,12 @@ auth:bearer {
 
 body:multipart-form {
   review: {"scoreFlavor":5,"scoreSauce":4,"scoreBread":5,"scorePresentation":5,"comment":"La mejor francesinha de Viana, volvere a proparla otra vez !!!"} @contentType(application/json)
-  ~ file: @file(C:/Users/Lequio_Fonte/Pictures/test-francesinha.jpg)
+  file: @file(D:\UOC\Master\2025_2\TFM\Project\taste_francesinhas_frontend\public\images-test\IMG-20260518-WA0013.jpg)
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
 }
 
 docs {
@@ -30,16 +31,11 @@ docs {
       deserializar a ReviewRequest. Cada score 1-5. Flag opcional "propuesta": true desde el flujo de
       proponer (la francesinha esta en PENDING). Si se omite, busca en ACCEPTED.
     - file (binario, OPCIONAL): la foto adjunta. Solo image/jpeg, image/png o image/webp. Max 5MB.
-
+  
   Para probar con foto:
     1. Descomenta la linea `file: @file(...)` (quita el `~`).
     2. Cambia la ruta por una imagen real de tu equipo.
     3. Envia la peticion.
-
+  
   La response trae photoUrl con la URL publica de Supabase Storage.
-}
-
-settings {
-  encodeUrl: false
-  timeout: 0
 }

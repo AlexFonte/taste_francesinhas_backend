@@ -7,11 +7,7 @@ meta {
 get {
   url: {{uri}}/francesinhas/stats
   body: none
-  auth: inherit
-}
-
-headers {
-  ~Authorization: Bearer {{authToken}}
+  auth: bearer
 }
 
 auth:bearer {

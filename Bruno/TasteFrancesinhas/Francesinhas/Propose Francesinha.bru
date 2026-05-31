@@ -7,18 +7,16 @@ meta {
 post {
   url: {{uri}}/francesinhas/propose
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 headers {
   Content-Type: application/json
-  ~ Authorization: Bearer {{authToken}}
 }
 
 auth:bearer {
   token: {{authToken}}
 }
-
 
 body:json {
   {
@@ -31,11 +29,32 @@ body:json {
     "isSpicy": false,
     "type": "ESPECIAL"
   }
-  
-  
 }
 
 settings {
   encodeUrl: false
   timeout: 0
+}
+
+docs {
+  Solo USER. Crea una francesinha en estado PENDING hasta que un ADMIN la apruebe o rechace.
+  El campo restaurantId debe apuntar a un restaurante existente.
+  Si se quiere proponer un restaurante nuevo, primero POST /restaurants y luego se usa el id devuelto aqui.
+  Tipos validos: CLASICA, ESPECIAL, VEGANA, KEBAB, MARISCO.
+
+  Este endpoint NO acepta imagen (solo JSON). La foto del propose va por la review asociada:
+  tras crear la francesinha, llama a POST /francesinhas/{id}/reviews (multipart) con el flag
+  "propuesta": true en el JSON de la parte review para que el backend busque la francesinha
+  en estado PENDING. Ver la peticion Reviews/Create Review en esta misma coleccion.
+
+  Flujo completo desde el frontend cuando el usuario propone con restaurante nuevo y foto:
+    1. POST /restaurants -> id del restaurante.
+    2. POST /francesinhas/propose -> id de la francesinha (este endpoint).
+    3. POST /francesinhas/{id}/reviews con "propuesta": true y la foto -> review creada.
+
+  Respuestas:
+  - 201 Created: francesinha creada en estado PENDING.
+  - 400 Bad Request: datos invalidos (precio negativo, tipo inexistente, restaurante inexistente...).
+  - 401 Unauthorized: sin token.
+  - 403 Forbidden: el token es de ADMIN (solo USER puede proponer).
 }

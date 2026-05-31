@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{uri}}/francesinhas/1/reviews?page=0&size=10&sort=createdAt,desc
+  url: {{uri}}/francesinhas/30/reviews?page=0&size=10&sort=createdAt,desc
   body: none
   auth: inherit
 }
@@ -16,13 +16,13 @@ params:query {
   sort: createdAt,desc
 }
 
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
 docs {
   Lista paginada de reviews. Solo funciona con francesinhas en estado ACCEPTED.
   La review del proponente de una francesinha PENDING viaja embebida en el DTO de
   GET /francesinhas/pending/{id} (campo userReview), no en este endpoint.
-}
-
-settings {
-  encodeUrl: true
-  timeout: 0
 }

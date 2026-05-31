@@ -7,12 +7,11 @@ meta {
 post {
   url: {{uri}}/restaurants
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 headers {
   Content-Type: application/json
-  ~ Authorization: Bearer {{authToken}}
 }
 
 auth:bearer {
